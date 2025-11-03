@@ -15,6 +15,8 @@ ${CMAKE_CURRENT_SOURCE_DIR}/glad/src/glad.c # GLAD
 # vvvvvvvvvvvvvvvvvvv
 
 ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/game/game.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/shader/shader.cpp
 
 )
 
