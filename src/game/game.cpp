@@ -5,7 +5,9 @@ void winResize(GLFWwindow* win, int width, int height)
     Game* game_ptr = (Game*) glfwGetWindowUserPointer(win);
     game_ptr->winSize.x = width;
     game_ptr->winSize.y = height;
+    glCheckErrorBefore("glViewport");
     glViewport(0, 0, width, height);
+    glCheckErrorAfter("glViewport");
 }
 
 Game::Game() {
@@ -36,12 +38,19 @@ int Game::init() {
         return 1;
     }
 
+    glCheckErrorBefore("glViewport");
     glViewport(0, 0, winSize.x, winSize.y);
+    glCheckErrorAfter("glViewport");
 
     glfwSetWindowUserPointer(win, this);
     glfwSetFramebufferSizeCallback(win, winResize);
 
+    glCheckErrorBefore("glClearColor");
     glClearColor(0.0f, 0.5f, 0.6f, 1.0f);
+    glCheckErrorAfter("glClearColor");
+
+    shader1.init(GL_VERTEX_SHADER, "shader_vertex.glsl");
+    shader1.compile();
 
     return 0;
 }
@@ -50,7 +59,9 @@ int Game::run() {
 
     while (!glfwWindowShouldClose(win)) {
 
+        glCheckErrorBefore("glClear");
         glClear(GL_COLOR_BUFFER_BIT);
+        glCheckErrorAfter("glClear");
 
         glfwPollEvents();
         glfwSwapBuffers(win);

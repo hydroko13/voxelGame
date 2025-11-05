@@ -7,8 +7,11 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 project(voxelGame)
 
+
+
 add_executable(voxelGame
 ${CMAKE_CURRENT_SOURCE_DIR}/glad/src/glad.c # GLAD 
+
 
 
 # PROJECT SOURCE CODE
@@ -17,7 +20,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/glad/src/glad.c # GLAD
 ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/src/game/game.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/src/shader/shader.cpp
-
+${CMAKE_CURRENT_SOURCE_DIR}/src/glerror/glerror.cpp
 )
 
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/resources" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
