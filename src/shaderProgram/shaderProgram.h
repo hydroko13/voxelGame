@@ -35,7 +35,9 @@ public:
 
 	void use();
 
+	void setInt(const char* name, int v);
 
+	void setFloat(const char* name, float v);
 
 	ShaderProgramStatus link();
 

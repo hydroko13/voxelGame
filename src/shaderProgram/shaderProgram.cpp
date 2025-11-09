@@ -72,3 +72,27 @@ ShaderProgramStatus ShaderProgram::link() {
 
 
 }
+
+void ShaderProgram::setInt(const char* name, int v) {
+	glCheckErrorBefore("glGetUniformLocation");
+	GLuint l = glGetUniformLocation(this->program_gpu_handle, name);
+	glCheckErrorAfter("glGetUniformLocation");
+
+	glCheckErrorBefore("glUniform1i");
+	glUniform1i(l, v);
+	glCheckErrorAfter("glUniform1i");
+
+
+}
+
+void ShaderProgram::setFloat(const char* name, float v) {
+	glCheckErrorBefore("glGetUniformLocation");
+	GLuint l = glGetUniformLocation(this->program_gpu_handle, name);
+	glCheckErrorAfter("glGetUniformLocation");
+
+	glCheckErrorBefore("glUniform1i");
+	glUniform1f(l, v);
+	glCheckErrorAfter("glUniform1i");
+
+
+}

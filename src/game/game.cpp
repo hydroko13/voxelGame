@@ -37,7 +37,7 @@ int Game::init() {
 
     
 
-
+    
 
 
     if (this->win == NULL) {
@@ -98,6 +98,17 @@ int Game::init() {
 
     this->shaderProgram1.use();
 
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_MIRRORED_REPEAT);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_MIRRORED_REPEAT);
+
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+
+    image1.initFromFile(std::filesystem::path("./resources/textures/mars_painting1.jpg"));
+
+    tex.init();
+
+    tex.fromImage(image1);
    
 
     this->VBO.init(GL_STATIC_DRAW);
@@ -120,6 +131,8 @@ int Game::init() {
         
     this->VAO.attrib(GL_FLOAT, 3, sizeof(float)*3);
 
+    this->VAO.attrib(GL_FLOAT, 2, sizeof(float) * 2);
+
     this->VAO.doneAttribs();
 
 
@@ -129,9 +142,7 @@ int Game::init() {
 
 
 
-
-
-
+    this->shaderProgram1.setInt("tex1", (int) tex.getHandle());
 
     return 0;
 }
@@ -146,6 +157,8 @@ int Game::run() {
         glCheckErrorAfter("glClear");
 
         this->shaderProgram1.use();
+        
+        this->tex.bind();
 
         this->VAO.bind();
 

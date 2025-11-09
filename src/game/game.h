@@ -11,6 +11,8 @@
 #include "../vertexArray/vertexArray.h"
 #include "../vertexBuffer/vertexBuffer.h"
 #include "../elementBuffer/elementBuffer.h"
+#include "../image/image.h"
+#include "../texture/texture.h"
 
 class Game {
     public:
@@ -21,12 +23,14 @@ class Game {
         VertexBuffer VBO;
         VertexArray VAO;
         ElementBuffer EBO;
+        Image image1;
+        Texture tex;
 
-        float vertices[12] = {
-        -0.5f, -0.5f, 0.0f,
-        -0.5f, 0.5f, 0.0f,
-        0.5f, 0.5f, 0.0f,
-        0.5f, -0.5f, 0.0f,
+        float vertices[20] = {
+        -0.5f, -0.5f, 0.0f,    0.0, 0.0f,
+        -0.5f, 0.5f, 0.0f,     0.0, 1.0f,
+        0.5f, 0.5f, 0.0f,      1.0, 1.0f,
+        0.5f, -0.5f, 0.0f,     1.0, 0.0f
         };
 
         unsigned int indices[6] = {
