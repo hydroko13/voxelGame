@@ -13,6 +13,7 @@
 #include "../elementBuffer/elementBuffer.h"
 #include "../image/image.h"
 #include "../texture/texture.h"
+#include "../camera/camera.h"
 
 class Game {
     public:
@@ -25,6 +26,7 @@ class Game {
         ElementBuffer EBO;
         Image image1;
         Texture tex;
+        Camera camera;
 
         float vertices[20] = {
         -0.5f, -0.5f, 0.0f,    0.0, 0.0f,
@@ -35,12 +37,13 @@ class Game {
 
         unsigned int indices[6] = {
             0, 1, 2,
-            0, 3, 2,
+            2, 3, 0
         };
         
 
-        
-        
+        glm::mat4 proj;
+        glm::mat4 model;
+
 
         Game();
         ~Game();

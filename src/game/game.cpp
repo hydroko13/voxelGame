@@ -65,6 +65,12 @@ int Game::init() {
     glClearColor(0.0f, 0.5f, 0.6f, 1.0f);
     glCheckErrorAfter("glClearColor");
 
+    glEnable(GL_DEPTH_TEST);
+    glEnable(GL_CULL_FACE);
+    glCullFace(GL_BACK);
+    glFrontFace(GL_CW);
+
+
 
 
     Shader vertShader;
@@ -150,6 +156,28 @@ int Game::init() {
 
     std::cout << tex.getHandle() << std::endl;
 
+   
+    this->proj = glm::mat4(1.0f);
+    this->model = glm::mat4(1.0f);
+
+
+    this->camera = Camera();
+
+  
+
+    this->shaderProgram1.use();
+
+    
+    this->proj = glm::perspective(glm::radians(45.0f), ((float)winSize.x) / ((float)winSize.y), 0.1f, 100.0f);
+
+    this->model = glm::translate(this->model, glm::vec3(0.0f, 0.0f, 0.5f));
+
+    this->camera.pos = glm::vec3(0.0f, 0.0f, 5.0f);
+
+    //this->camera.pos = glm::vec3(0.0f, 0.0f, 3.0f);
+
+    this->shaderProgram1.setMat4f("proj", proj);
+
 
     return 0;
 }
@@ -160,12 +188,48 @@ int Game::run() {
     while (!glfwWindowShouldClose(win)) {
 
         glCheckErrorBefore("glClear");
-        glClear(GL_COLOR_BUFFER_BIT);
+        glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
         glCheckErrorAfter("glClear");
 
 
 
         this->shaderProgram1.use();
+
+        this->model = glm::mat4(1.0f);
+
+        this->model = glm::translate(this->model, glm::vec3(0.0f, 0.0f, 0.5f));
+
+        
+       
+
+        //this->model = glm::rotate(this->model, glm::radians(15.0f * (float)glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
+
+
+       
+
+
+        
+        if (glfwGetKey(win, GLFW_KEY_A)) {
+            this->camera.yaw -= 1.0f;
+        }
+        if (glfwGetKey(win, GLFW_KEY_D)) {
+            this->camera.yaw += 1.0f;
+        }
+
+        if (glfwGetKey(win, GLFW_KEY_S)) {
+            this->camera.pitch -= 1.0f;
+        }
+        if (glfwGetKey(win, GLFW_KEY_W)) {
+            this->camera.pitch += 1.0f;
+        }
+
+
+
+        this->camera.updateViewMat();
+
+        this->shaderProgram1.setMat4f("view", this->camera.viewMat);
+
+        this->shaderProgram1.setMat4f("model", model);
 
         this->tex.bind();
 
@@ -173,10 +237,14 @@ int Game::run() {
 
         
 
+
+
         
         glCheckErrorBefore("glDrawArrays");
         glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
         glCheckErrorAfter("glDrawArrays");
+
+
 
 
 

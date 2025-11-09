@@ -10,6 +10,7 @@
 #include "../shader/shader.h"
 #include <vector>
 #include "../glerror/glerror.h"
+#include <glm/gtc/type_ptr.hpp>
 
 
 enum class ShaderProgramStatus {
@@ -38,6 +39,8 @@ public:
 	void setInt(const char* name, int v);
 
 	void setFloat(const char* name, float v);
+
+	void setMat4f(const char* name, glm::mat4& v);
 
 	ShaderProgramStatus link();
 

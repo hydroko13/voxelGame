@@ -75,7 +75,7 @@ ShaderProgramStatus ShaderProgram::link() {
 
 void ShaderProgram::setInt(const char* name, int v) {
 	glCheckErrorBefore("glGetUniformLocation");
-	GLuint l = glGetUniformLocation(this->program_gpu_handle, name);
+	GLint l = glGetUniformLocation(this->program_gpu_handle, name);
 	glCheckErrorAfter("glGetUniformLocation");
 
 	glCheckErrorBefore("glUniform1i");
@@ -87,12 +87,24 @@ void ShaderProgram::setInt(const char* name, int v) {
 
 void ShaderProgram::setFloat(const char* name, float v) {
 	glCheckErrorBefore("glGetUniformLocation");
-	GLuint l = glGetUniformLocation(this->program_gpu_handle, name);
+	GLint l = glGetUniformLocation(this->program_gpu_handle, name);
 	glCheckErrorAfter("glGetUniformLocation");
 
-	glCheckErrorBefore("glUniform1i");
+	glCheckErrorBefore("glUniform1f");
 	glUniform1f(l, v);
-	glCheckErrorAfter("glUniform1i");
+	glCheckErrorAfter("glUniform1f");
 
+
+}
+
+
+void ShaderProgram::setMat4f(const char* name, glm::mat4& v) {
+	glCheckErrorBefore("glGetUniformLocation");
+	GLint l = glGetUniformLocation(this->program_gpu_handle, name);
+	glCheckErrorAfter("glGetUniformLocation");
+
+	glCheckErrorBefore("glUniformMatrix4fv");
+	glUniformMatrix4fv(l, 1, GL_FALSE, glm::value_ptr(v));
+	glCheckErrorAfter("glUniformMatrix4fv");
 
 }

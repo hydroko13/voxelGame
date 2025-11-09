@@ -28,6 +28,7 @@ ${CMAKE_CURRENT_SOURCE_DIR}/src/vertexBuffer/vertexBuffer.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/src/elementBuffer/elementBuffer.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/src/texture/texture.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/src/image/image.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/camera/camera.cpp
 )
 
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/resources" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
