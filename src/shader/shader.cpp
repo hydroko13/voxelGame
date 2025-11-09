@@ -4,11 +4,22 @@
 
 Shader::Shader() {
 
+
 }
 
-Shader::~Shader() {
+void Shader::destroy() {
 	std::cout << "Deleted shader: " << this->filename << std::endl;
+	glCheckErrorBefore("glDeleteShader");
 	glDeleteShader(shader_gpu_handle);
+	glCheckErrorAfter("glDeleteShader");
+}
+
+GLuint Shader::getHandle() {
+	return this->shader_gpu_handle;
+}
+
+GLenum Shader::getShaderType() {
+	return this->shader_type;
 }
 
 ShaderStatus Shader::init(GLenum shader_type, const char* filename) {
@@ -80,6 +91,7 @@ ShaderStatus Shader::compile() {
 		glGetShaderInfoLog(this->shader_gpu_handle, 512, NULL, infoLog);
 		glCheckErrorAfter("glGetShaderInfoLog");
 		std::cout << "Failure log: " << infoLog << std::endl;
+		return ShaderStatus::CompileFailed;
 	} 
 	else {
 		std::cout << "Shader compile success: " << this->filename << std::endl;

@@ -8,12 +8,12 @@ int main() {
 
     if (game.init() != 0) {
         
-        return -1;
+        return 100;
     }
     if (game.run() != 0)
     {
     
-        return -1;
+        return 200;
     }
     
 

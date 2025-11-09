@@ -22,23 +22,25 @@ enum class ShaderStatus {
 class Shader {
 
     private:
-        GLuint shader_gpu_handle;
-        GLenum shader_type;
-        bool initalized;
-        bool compiled;
+        GLuint shader_gpu_handle = NULL;
+        GLenum shader_type = NULL;
         std::string filename;
 
         std::string shader_source_code;
         
 
     public:
+
         Shader();
-        ~Shader();
+        void destroy();
 
         ShaderStatus init(GLenum shader_type, const char* fp);
-
+        
 
         ShaderStatus compile();
+
+        GLuint getHandle();
+        GLenum getShaderType();
 
         
 };

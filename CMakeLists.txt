@@ -21,6 +21,11 @@ ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/src/game/game.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/src/shader/shader.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/src/glerror/glerror.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/shaderProgram/shaderProgram.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/vertexAttribute/vertexAttribute.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/vertexArray/vertexArray.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/vertexBuffer/vertexBuffer.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/elementBuffer/elementBuffer.cpp
 )
 
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/resources" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")
