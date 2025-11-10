@@ -62,3 +62,20 @@ int Image::initFromFile(std::filesystem::path fp) {
 unsigned char* Image::getRawData() {
 	return this->data;
 }
+
+std::tuple<int, int, int, int> Image::getPixel(int x, int y)
+{
+	int idx = (y * width + x) * 4;
+	return std::tuple<int, int, int, int>((int) this->data[idx], (int) this->data[idx + 1], (int) this->data[idx + 2], (int) this->data[idx+3]);
+}
+
+void Image::setPixel(int x, int y, int r, int g, int b, int a)
+{
+	int idx = (y * width + x) * 4;
+	this->data[idx] = (unsigned char) r;
+	this->data[idx+1] = (unsigned char) g;
+	this->data[idx + 2] = (unsigned char) b;
+	this->data[idx + 3] = (unsigned char) a;
+
+
+}

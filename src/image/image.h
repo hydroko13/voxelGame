@@ -9,6 +9,7 @@
 #include <filesystem>
 #include <memory>
 #include <string>
+#include <tuple>
 
 class Image {
 private:
@@ -29,4 +30,7 @@ public:
 
 	unsigned char* getRawData();
 
+	std::tuple<int, int, int, int> getPixel(int x, int y);
+
+	void setPixel(int x, int y, int r, int g, int b, int a);
 };

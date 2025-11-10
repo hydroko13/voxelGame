@@ -108,6 +108,8 @@ int Game::init() {
 
     image1.initFromFile(std::filesystem::path("./resources/textures/mars_painting1.jpg"));
 
+    image1.setPixel(2, 2, 255, 0, 0, 255);
+
     tex.init();
 
     glActiveTexture(GL_TEXTURE1);
