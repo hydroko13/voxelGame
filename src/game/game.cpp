@@ -10,7 +10,7 @@ void winResize(GLFWwindow* win, int width, int height)
     glCheckErrorAfter("glViewport");
 }
 
-Game::Game() {
+Game::Game() : chunk1(glm::ivec2(0, 0)) {
     this->winSize = glm::ivec2(960, 960);
     
 }
@@ -202,6 +202,12 @@ int Game::init() {
     this->mx = 0.0;
     this->my = 0.0;
 
+    glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+
+    this->chunk1.init();
+
+    
+
     return 0;
 }
 
@@ -248,15 +254,22 @@ int Game::run() {
 
         if (glfwGetKey(win, GLFW_KEY_S))
         {
-            this->camera.pos -= this->camera.directionVec * 0.05f;
+            this->camera.pos -= this->camera.directionVec * 0.08f;
         }
         if (glfwGetKey(win, GLFW_KEY_W))
         {
-            this->camera.pos += this->camera.directionVec * 0.05f;
+            this->camera.pos += this->camera.directionVec * 0.08f;
         }
+        if (glfwGetKey(win, GLFW_KEY_ESCAPE))
+        {
+            glfwSetWindowShouldClose(win, 1);
+        }
+        
 
-        this->camera.pitch += relX;
-        this->camera.yaw += relY;
+        this->camera.pitch -= relY * 0.2;
+        this->camera.yaw += relX * 0.2;
+        this->camera.pitch = std::clamp(this->camera.pitch, -90.0f, 90.0f);
+        
 
         this->camera.updateViewMat();
 

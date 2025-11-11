@@ -18,6 +18,9 @@
 #include "../imageAtlas/imageAtlas.h"
 #include "../blockRegistry/blockRegistry.h"
 #include "../block/block.h"
+#include "../chunk/chunk.h"
+#include <cmath>
+
 
 class Game {
     public:
@@ -32,6 +35,7 @@ class Game {
         Camera camera;
         ImageAtlas blockAtlas;
         BlockRegistry blockRegistry;
+        Chunk chunk1;
 
         float vertices[20] = {
         -0.5f, -0.5f, 0.0f,    0.0, 0.0f,

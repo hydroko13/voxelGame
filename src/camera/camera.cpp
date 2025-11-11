@@ -12,11 +12,10 @@ Camera::Camera() {
 
 
 void Camera::updateViewMat() {
-	this->directionVec = glm::vec3(
+	this->directionVec = glm::normalize(glm::vec3(
 		glm::cos(glm::radians(pitch)) * glm::cos(glm::radians(yaw)),
 		glm::sin(glm::radians(pitch)),
-		glm::cos(glm::radians(pitch)) * glm::sin(glm::radians(yaw))
-	);
+		glm::cos(glm::radians(pitch)) * glm::sin(glm::radians(yaw))));
 
 	std::cout << "x " << this->directionVec.x << " y " << this->directionVec.y << " z " << this->directionVec.z << std::endl;
 

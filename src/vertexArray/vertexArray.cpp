@@ -27,6 +27,8 @@ void VertexArray::beginAttribs() {
 
 void VertexArray::doneAttribs() {
 
+	
+
 	int idx = 0;
 	int stride = 0;
 	int offset = 0;

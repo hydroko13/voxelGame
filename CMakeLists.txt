@@ -34,6 +34,8 @@ ${CMAKE_CURRENT_SOURCE_DIR}/src/imageAtlas/imageAtlas.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/src/util/util.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/src/blockRegistry/blockRegistry.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/src/block/block.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/chunk/chunk.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/chunkData/chunkData.cpp
 
 )
 

@@ -7,11 +7,12 @@
 #include "../glerror/glerror.h"
 #include <iostream>
 #include "../image/image.h"
+#include <memory>
 
 class ChunkData {
 
 private:
-		unsigned char* data = new unsigned char[16 * 16 * 256 * 1];
+		unsigned char* data;
 
 public:
 
