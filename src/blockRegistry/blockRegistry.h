@@ -8,11 +8,15 @@
 #include <iostream>
 #include <unordered_map>
 #include "../image/image.h"
+#include "../block/block.h"
 
 class BlockRegistry {
 private:
-	std::unordered_map
+	std::unordered_map<unsigned int, Block> blocks;
 
 public:
+	BlockRegistry();
 
+	Block& getBlock(unsigned int id);
+	void registerBlock(unsigned int id, Block block);
 };

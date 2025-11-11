@@ -108,35 +108,6 @@ int Game::init() {
 
     imageAtlas.init();
 
-    image1.initFromFile(std::filesystem::path("resources/textures/mars_painting1.jpg"));
-
-    Image image2;
-
-    image2.initFromFile(std::filesystem::path("resources/textures/blocks/debug_block/debug_block_bottom.png"));
-     
-    imageAtlas.addImg(image1, "painting");
-    imageAtlas.addImg(image2, "debug");
-       
-
-    
-    
-    std::tuple<float, float, float, float> fRect = imageAtlas.getTexCoords("debug");
-
-
-    
-    this->vertices[3] = std::get<0>(fRect);
-    this->vertices[4] = std::get<1>(fRect);
-
-    this->vertices[8] = std::get<0>(fRect);
-    this->vertices[9] = std::get<3>(fRect);
-
-    this->vertices[13] = std::get<2>(fRect);
-    this->vertices[14] = std::get<3>(fRect);
-
-    this->vertices[18] = std::get<2>(fRect);
-    this->vertices[19] = std::get<1>(fRect);
-
-
 
     tex.init();
 

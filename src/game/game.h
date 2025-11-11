@@ -16,6 +16,8 @@
 #include "../texture/texture.h"
 #include "../camera/camera.h"
 #include "../imageAtlas/imageAtlas.h"
+#include "../blockRegistry/blockRegistry.h"
+#include "../block/block.h"
 
 class Game {
     public:
@@ -26,9 +28,10 @@ class Game {
         VertexBuffer VBO;
         VertexArray VAO;
         ElementBuffer EBO;
-        Image image1;
         Texture tex;
         Camera camera;
+        ImageAtlas blockAtlas;
+        BlockRegistry blockRegistry;
 
         float vertices[20] = {
         -0.5f, -0.5f, 0.0f,    0.0, 0.0f,
