@@ -26,18 +26,18 @@ int Game::init() {
     glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
     glfwWindowHint(GLFW_RESIZABLE, false);
 
-    
+
 
     this->win = glfwCreateWindow(winSize.x, winSize.y, "Voxel game", NULL, NULL);
     GLFWmonitor* mon = glfwGetPrimaryMonitor();
 
     const GLFWvidmode* monMode = glfwGetVideoMode(mon);
-    
+
     glfwSetWindowMonitor(win, NULL, monMode->width / 2 - winSize.x / 2, monMode->height / 2 - winSize.y / 2, winSize.x, winSize.y, GLFW_DONT_CARE);
 
-    
 
-    
+
+
 
 
     if (this->win == NULL) {
@@ -56,7 +56,7 @@ int Game::init() {
     glViewport(0, 0, winSize.x, winSize.y);
     glCheckErrorAfter("glViewport");
 
-    
+
 
     glfwSetWindowUserPointer(win, this);
     glfwSetFramebufferSizeCallback(win, winResize);
@@ -98,17 +98,45 @@ int Game::init() {
     if (this->shaderProgram1.link() == ShaderProgramStatus::LinkFailed) {
         return 1;
     }
-   
+
     vertShader.destroy();
     fragShader.destroy();
 
     this->shaderProgram1.use();
 
+    ImageAtlas imageAtlas;
+
+    imageAtlas.init();
+
+    image1.initFromFile(std::filesystem::path("resources/textures/mars_painting1.jpg"));
+
+    Image image2;
+
+    image2.initFromFile(std::filesystem::path("resources/textures/blocks/debug_block/debug_block_bottom.png"));
+     
+    imageAtlas.addImg(image1, "painting");
+    imageAtlas.addImg(image2, "debug");
+       
+
+    
+    
+    std::tuple<float, float, float, float> fRect = imageAtlas.getTexCoords("debug");
 
 
-    image1.initFromFile(std::filesystem::path("./resources/textures/mars_painting1.jpg"));
+    
+    this->vertices[3] = std::get<0>(fRect);
+    this->vertices[4] = std::get<1>(fRect);
 
-    image1.setPixel(2, 2, 255, 0, 0, 255);
+    this->vertices[8] = std::get<0>(fRect);
+    this->vertices[9] = std::get<3>(fRect);
+
+    this->vertices[13] = std::get<2>(fRect);
+    this->vertices[14] = std::get<3>(fRect);
+
+    this->vertices[18] = std::get<2>(fRect);
+    this->vertices[19] = std::get<1>(fRect);
+
+
 
     tex.init();
 
@@ -122,7 +150,7 @@ int Game::init() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
 
-    tex.fromImage(image1);
+    tex.fromImage(imageAtlas.img);
 
     this->shaderProgram1.setInt("tex1", 1);
    

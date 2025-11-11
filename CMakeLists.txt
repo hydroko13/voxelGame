@@ -31,6 +31,8 @@ ${CMAKE_CURRENT_SOURCE_DIR}/src/image/image.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/src/camera/camera.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/src/camera/camera.cpp
 ${CMAKE_CURRENT_SOURCE_DIR}/src/imageAtlas/imageAtlas.cpp
+${CMAKE_CURRENT_SOURCE_DIR}/src/util/util.cpp
+
 )
 
 file(COPY "${CMAKE_CURRENT_SOURCE_DIR}/resources" DESTINATION "${CMAKE_CURRENT_BINARY_DIR}")

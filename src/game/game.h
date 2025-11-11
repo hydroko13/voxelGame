@@ -5,6 +5,7 @@
 #include <glm/glm.hpp>
 #include <GLFW/glfw3.h>
 #include <iostream>
+#include <tuple>
 #include "../glerror/glerror.h"
 #include "../shader/shader.h"
 #include "../shaderProgram/shaderProgram.h"
@@ -14,6 +15,7 @@
 #include "../image/image.h"
 #include "../texture/texture.h"
 #include "../camera/camera.h"
+#include "../imageAtlas/imageAtlas.h"
 
 class Game {
     public:

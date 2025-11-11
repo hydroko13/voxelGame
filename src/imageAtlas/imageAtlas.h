@@ -8,14 +8,18 @@
 #include <string>
 #include <unordered_map>
 #include <tuple>
+#include <utility>
 #include "../image/image.h"
+#include "../util/util.h"
 
 class ImageAtlas {
     private:
-        Image img;
-        std::unordered_map<std::string, std::tuple<float, float, float, float>> imagesStitched;
+       
+        std::unordered_map<std::string, std::tuple<int, int, int, int>> imagesStitched;
 
     public:
+
+        Image img;
         ImageAtlas();
 
         void init();
