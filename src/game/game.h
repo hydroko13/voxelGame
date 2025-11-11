@@ -46,6 +46,9 @@ class Game {
         };
         
 
+        double mx;
+        double my;
+
         glm::mat4 proj;
         glm::mat4 model;
 

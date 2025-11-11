@@ -104,10 +104,16 @@ int Game::init() {
 
     this->shaderProgram1.use();
 
+    Image image1;
+
+    image1.initFromFile(std::filesystem::path("resources/textures/blocks/debug_block/debug_block_bottom.png"));
+
     ImageAtlas imageAtlas;
 
     imageAtlas.init();
 
+    imageAtlas.addImg(image1, "debug_block_bottom");
+    imageAtlas.addImg(image1, "debug_block_bottom2");
 
     tex.init();
 
@@ -123,8 +129,23 @@ int Game::init() {
 
     tex.fromImage(imageAtlas.img);
 
+    auto coords = imageAtlas.getTexCoords("debug_block_bottom");
+
+    this->vertices[3] = std::get<0>(coords);
+    this->vertices[4] = std::get<1>(coords);
+
+    this->vertices[8] = std::get<0>(coords);
+    this->vertices[9] = std::get<3>(coords);
+
+    this->vertices[13] = std::get<2>(coords);
+    this->vertices[14] = std::get<3>(coords);
+
+    this->vertices[18] = std::get<2>(coords);
+    this->vertices[19] = std::get<1>(coords);
+
+    
+
     this->shaderProgram1.setInt("tex1", 1);
-   
 
     this->VBO.init(GL_STATIC_DRAW);
 
@@ -178,7 +199,8 @@ int Game::init() {
     //this->camera.pos = glm::vec3(0.0f, 0.0f, 3.0f);
 
     this->shaderProgram1.setMat4f("proj", proj);
-
+    this->mx = 0.0;
+    this->my = 0.0;
 
     return 0;
 }
@@ -210,21 +232,31 @@ int Game::run() {
 
 
         
-        if (glfwGetKey(win, GLFW_KEY_A)) {
-            this->camera.yaw -= 1.0f;
+        
+        
+
+        double nx;
+        double ny;
+
+        glfwGetCursorPos(win, &nx, &ny);
+
+        float relX = nx - mx;
+        float relY = ny - my;
+
+        mx = nx;
+        my = ny;
+
+        if (glfwGetKey(win, GLFW_KEY_S))
+        {
+            this->camera.pos -= this->camera.directionVec * 0.05f;
         }
-        if (glfwGetKey(win, GLFW_KEY_D)) {
-            this->camera.yaw += 1.0f;
+        if (glfwGetKey(win, GLFW_KEY_W))
+        {
+            this->camera.pos += this->camera.directionVec * 0.05f;
         }
 
-        if (glfwGetKey(win, GLFW_KEY_S)) {
-            this->camera.pitch -= 1.0f;
-        }
-        if (glfwGetKey(win, GLFW_KEY_W)) {
-            this->camera.pitch += 1.0f;
-        }
-
-
+        this->camera.pitch += relX;
+        this->camera.yaw += relY;
 
         this->camera.updateViewMat();
 
