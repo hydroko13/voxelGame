@@ -15,6 +15,9 @@ ChunkData::ChunkData() {
     }
 }
 
+
+
+
 ChunkData::~ChunkData() {
     free(this->data);
 }
@@ -26,4 +29,23 @@ void ChunkData::setBlock(glm::ivec3 blockPos, unsigned int blockID) {
 
 
     this->data[(blockPos.y * (16 * 16)) + (blockPos.x * 16) + blockPos.z] = blockByte;
+}
+
+
+unsigned char ChunkData::getBlock(glm::ivec3 blockPos) {
+
+    if (blockPos.x < 0 || blockPos.x > 15) {
+        return 0;
+    }
+
+    if (blockPos.z < 0 || blockPos.z > 15) {
+        return 0;
+    }
+
+    if (blockPos.y < 0 || blockPos.y > 255) {
+        return 0;
+    }
+
+    return this->data[(blockPos.y * (16 * 16)) + (blockPos.x * 16) + blockPos.z];
+   
 }

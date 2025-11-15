@@ -10,7 +10,7 @@ void winResize(GLFWwindow* win, int width, int height)
     glCheckErrorAfter("glViewport");
 }
 
-Game::Game() : chunk1(glm::ivec2(0, 0)) {
+Game::Game() {
     this->winSize = glm::ivec2(960, 960);
     
 }
@@ -104,16 +104,32 @@ int Game::init() {
 
     this->shaderProgram1.use();
 
-    Image image1;
-
-    image1.initFromFile(std::filesystem::path("resources/textures/blocks/debug_block/debug_block_bottom.png"));
+    
 
     ImageAtlas imageAtlas;
 
+
+
     imageAtlas.init();
 
-    imageAtlas.addImg(image1, "debug_block_bottom");
-    imageAtlas.addImg(image1, "debug_block_bottom2");
+
+    for (auto f : std::filesystem::recursive_directory_iterator("resources/textures/blocks/")) {
+        if (f.is_regular_file()) {
+            std::filesystem::path fp = f.path();
+            if (fp.extension().string() == std::string(".png")) {
+                std::cout << "Adding image " << fp.filename() << " to block texture atlas...\n";
+                Image image;
+
+                image.initFromFile(fp);
+
+                imageAtlas.addImg(image, fp.filename().string());
+            }
+            
+        }
+    }
+
+
+    
 
     tex.init();
 
@@ -129,25 +145,29 @@ int Game::init() {
 
     tex.fromImage(imageAtlas.img);
 
-    auto coords = imageAtlas.getTexCoords("debug_block_bottom");
+    blockRegistry.registerBlock(1, Block(imageAtlas, "debug_block_top.png", "debug_block_bottom.png", "debug_block_north.png", "debug_block_south.png", "debug_block_west.png", "debug_block_east.png"));
+    blockRegistry.registerBlock(2, Block(imageAtlas, "grass_block_top.png", "grass_block_bottom.png", "grass_block_side.png", "grass_block_side.png", "grass_block_side.png", "grass_block_side.png"));
 
-    this->vertices[3] = std::get<0>(coords);
-    this->vertices[4] = std::get<1>(coords);
 
-    this->vertices[8] = std::get<0>(coords);
-    this->vertices[9] = std::get<3>(coords);
+    auto coords = imageAtlas.getTexCoords("debug_block_bottom.png");
 
-    this->vertices[13] = std::get<2>(coords);
-    this->vertices[14] = std::get<3>(coords);
+    //this->vertices[3] = std::get<0>(coords);
+    //this->vertices[4] = std::get<1>(coords);
 
-    this->vertices[18] = std::get<2>(coords);
-    this->vertices[19] = std::get<1>(coords);
+    //this->vertices[8] = std::get<0>(coords);
+    //this->vertices[9] = std::get<3>(coords);
+
+    //this->vertices[13] = std::get<2>(coords);
+    //this->vertices[14] = std::get<3>(coords);
+
+    //this->vertices[18] = std::get<2>(coords);
+    //this->vertices[19] = std::get<1>(coords);
 
     
 
     this->shaderProgram1.setInt("tex1", 1);
 
-    this->VBO.init(GL_STATIC_DRAW);
+    /*this->VBO.init(GL_STATIC_DRAW);
 
     this->EBO.init(GL_STATIC_DRAW);
 
@@ -169,14 +189,14 @@ int Game::init() {
 
     this->VAO.attrib(GL_FLOAT, 2, sizeof(float) * 2);
 
-    this->VAO.doneAttribs();
+    this->VAO.doneAttribs();*/
 
 
 
     
-    this->VAO.unbind();
+    //this->VAO.unbind();
 
-    std::cout << tex.getHandle() << std::endl;
+    //std::cout << tex.getHandle() << std::endl;
 
    
     this->proj = glm::mat4(1.0f);
@@ -190,7 +210,7 @@ int Game::init() {
     this->shaderProgram1.use();
 
     
-    this->proj = glm::perspective(glm::radians(45.0f), ((float)winSize.x) / ((float)winSize.y), 0.1f, 100.0f);
+    this->proj = glm::perspective(glm::radians(90.0f), ((float)winSize.x) / ((float)winSize.y), 0.1f, 100.0f);
 
     this->model = glm::translate(this->model, glm::vec3(0.0f, 0.0f, 0.5f));
 
@@ -204,9 +224,15 @@ int Game::init() {
 
     glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    this->chunk1.init();
+    chunk.generate();
 
+    chunk.init(glm::ivec2(0, 0));
     
+
+
+    chunk.updateMesh(blockRegistry);
+    chunk.updateVBO();
+
 
     return 0;
 }
@@ -254,11 +280,11 @@ int Game::run() {
 
         if (glfwGetKey(win, GLFW_KEY_S))
         {
-            this->camera.pos -= this->camera.directionVec * 0.08f;
+            this->camera.pos -= this->camera.directionVec * 0.5f;
         }
         if (glfwGetKey(win, GLFW_KEY_W))
         {
-            this->camera.pos += this->camera.directionVec * 0.08f;
+            this->camera.pos += this->camera.directionVec * 0.5f;
         }
         if (glfwGetKey(win, GLFW_KEY_ESCAPE))
         {
@@ -268,7 +294,7 @@ int Game::run() {
 
         this->camera.pitch -= relY * 0.2;
         this->camera.yaw += relX * 0.2;
-        this->camera.pitch = std::clamp(this->camera.pitch, -90.0f, 90.0f);
+        this->camera.pitch = std::clamp(this->camera.pitch, -89.0f, 89.0f);
         
 
         this->camera.updateViewMat();
@@ -279,18 +305,7 @@ int Game::run() {
 
         this->tex.bind();
 
-        this->VAO.bind();
-
-        
-
-
-
-        
-        glCheckErrorBefore("glDrawArrays");
-        glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
-        glCheckErrorAfter("glDrawArrays");
-
-
+        chunk.draw();
 
 
 
@@ -304,8 +319,6 @@ int Game::run() {
 
 Game::~Game() {;
     std::cout << "game destructor called\n";
-    this->VAO.destroy();
-    this->VBO.destroy();
     this->shaderProgram1.destroy();
 
     glfwTerminate();

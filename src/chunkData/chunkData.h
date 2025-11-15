@@ -20,6 +20,7 @@ public:
 
 	~ChunkData();
 
+	unsigned char getBlock(glm::ivec3 blockPos);
 	void setBlock(glm::ivec3 blockPos, unsigned int blockID);
 
 

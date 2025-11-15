@@ -13,6 +13,7 @@
 #include "../elementBuffer/elementBuffer.h"
 #include "../vertexArray/vertexArray.h"
 #include "../chunkData/chunkData.h"
+#include <tuple>
 
 
 
@@ -25,14 +26,26 @@ public:
 	ElementBuffer ebo;
 	VertexArray vao;
 
-	Chunk(glm::ivec2 chunkPos);
-	~Chunk();
+
+
+
+	std::vector<float> vertices;
+	std::vector<unsigned int> indices;
+
+
+	Chunk();
 
 	void generate();
 
-	void updateVBO(BlockRegistry& blockRegistry);
+	void updateVBO();
 
-	void init();
+	void updateMesh(BlockRegistry& blockRegistry);
+
+	void destroy();
+
+	void draw();
+
+	void init(glm::ivec2 pos);
 
 
 };

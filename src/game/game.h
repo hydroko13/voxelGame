@@ -28,14 +28,10 @@ class Game {
 
         GLFWwindow *win = nullptr;
         ShaderProgram shaderProgram1;
-        VertexBuffer VBO;
-        VertexArray VAO;
-        ElementBuffer EBO;
         Texture tex;
         Camera camera;
         ImageAtlas blockAtlas;
         BlockRegistry blockRegistry;
-        Chunk chunk1;
 
         float vertices[20] = {
         -0.5f, -0.5f, 0.0f,    0.0, 0.0f,
@@ -56,6 +52,7 @@ class Game {
         glm::mat4 proj;
         glm::mat4 model;
 
+        Chunk chunk;
 
         Game();
         ~Game();
