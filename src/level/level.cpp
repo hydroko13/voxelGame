@@ -1,190 +1,299 @@
 #include "level.h"
 
+
 Level::Level() {
-    
+   
 }
 
-void Level::generateChunks(int quadrant) {
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(quadrant*25));
+void Level::generateChunks(int threadId) {
 
 
-    while (!this->doneGame) {
 
-        int x1 = 0;
-        int x2 = 0;
-        int z1 = 0;
-        int z2 = 0;
-        int xstep = 0;
-        int zstep = 0;
+    
+    int x = chunkGenOriginX.load();
+    int z = chunkGenOriginY.load();
+    std::cout << "Thread " << threadId << " starting spiral at (" << x << "," << z << ")\n";
+    int spiralStage = 0;
+    int spiralOriginZ = 0;
+    int spiralOriginX = 0;
+    int spiralLoop = 1;
+    int spiralOrgX = x;
+    int spiralOrgZ = z;
 
-        if (quadrant == 1) {
-            x1 = chunkGenOrigin.x + 0;
-            x2 = chunkGenOrigin.x + 6;
-            z1 = chunkGenOrigin.y + 0;
-            z2 = chunkGenOrigin.y + 6;
-            xstep = 1;
-            zstep = 1;
+
+    for (int i = 0; i < threadId; i++) {
+        if (spiralStage == 0) {
+            x -= 1;
+            spiralOriginZ = z;
+            spiralStage = 1;
         }
-        if (quadrant == 2) {
-            x1 = chunkGenOrigin.x + 0;
-            x2 = chunkGenOrigin.x + -6;
-            z1 = chunkGenOrigin.y + 0;
-            z2 = chunkGenOrigin.y + 6;
-            xstep = -1;
-            zstep = 1;
+
+        else if (spiralStage == 1) {
+            z += 1;
+            if (abs(z - spiralOriginZ) >= spiralLoop) {
+                spiralStage = 2;
+                spiralOriginX = x;
+            }
+
         }
-        if (quadrant == 3) {
-            x1 = chunkGenOrigin.x + 0;
-            x2 = chunkGenOrigin.x + -6;
-            z1 = chunkGenOrigin.y + 0;
-            z2 = chunkGenOrigin.y + -6;
-            xstep = -1;
-            zstep = -1;
+        else if (spiralStage == 2) {
+            x += 1;
+            if (abs(x - spiralOriginX) >= spiralLoop + 1) {
+                spiralStage = 3;
+                spiralOriginZ = z;
+            }
+
         }
-        if (quadrant == 4) {
-            x1 = chunkGenOrigin.x + 0;
-            x2 = chunkGenOrigin.x + 6;
-            z1 = chunkGenOrigin.y + 0;
-            z2 = chunkGenOrigin.y + -6;
-            xstep = 1;
-            zstep = -1;
+        else if (spiralStage == 3) {
+            z -= 1;
+            if (abs(z - spiralOriginZ) >= spiralLoop + 1) {
+                spiralStage = 4;
+                spiralOriginX = x;
+            }
+
         }
+
+        else if (spiralStage == 4) {
+            x -= 1;
+            if (abs(x - spiralOriginX) >= spiralLoop + 2) {
+                spiralStage = 1;
+                spiralOriginZ = z;
+                spiralLoop += 2;
+
+            }
+
+        }
+    }
+  
+
+    while (!stopGen.load()) {
+
         
 
-        for (int x = x1; x != x2; x+=xstep) {
-            for (int z = z1; z != z2; z+=zstep) {
+        while (true) {
+            bool generatedOneChunk = false;
 
-                glm::ivec2 cPos(x, z);
+            glm::ivec2 cPos(x, z);
 
 
 
-                chunksMutex.lock_shared();
-                
-                auto p = this->chunks.try_emplace(cPos, cPos);
-                if (p.second) {
-                    chunksMutex.unlock_shared();
-                    Chunk& chunk = p.first->second;
+            chunksMutex.lock();
 
-                    
+            auto p = this->chunks.try_emplace(cPos, cPos);
+            if (p.second) {
+                chunksMutex.unlock();
+                Chunk& chunk = p.first->second;
 
-                    if (!chunk.generated) {
-                        chunk.generate(worldGen);
+
+
+                if (!chunk.generated) {
+                    generatedOneChunk = true;
+                    chunk.generate(worldGen);
+
+                }
+
+
+
+
+
+
+                chunkstoinitMutex.lock();
+
+                this->chunkstoinit.push(cPos);
+
+                chunkstoinitMutex.unlock();
+
+            }
+            else {
+                chunksMutex.unlock();
+            }
+
+            for (int i = 0; i < 8; i++) {
+                if (spiralStage == 0) {
+                    x -= 1;
+                    spiralOriginZ = z;
+                    spiralStage = 1;
+                }
+
+                else if (spiralStage == 1) {
+                    z += 1;
+                    if (abs(z - spiralOriginZ) >= spiralLoop) {
+                        spiralStage = 2;
+                        spiralOriginX = x;
                     }
 
-
-
-
-
-
-                    chunkstoinitMutex.lock();
-
-                    this->chunkstoinit.push(cPos);
-
-                    chunkstoinitMutex.unlock();
+                }
+                else if (spiralStage == 2) {
+                    x += 1;
+                    if (abs(x - spiralOriginX) >= spiralLoop + 1) {
+                        spiralStage = 3;
+                        spiralOriginZ = z;
+                    }
 
                 }
-                else {
-                    chunksMutex.unlock_shared();
+                else if (spiralStage == 3) {
+                    z -= 1;
+                    if (abs(z - spiralOriginZ) >= spiralLoop + 1) {
+                        spiralStage = 4;
+                        spiralOriginX = x;
+                    }
+
                 }
-                
-                   
-                
-                
 
-          
+                else if (spiralStage == 4) {
+                    x -= 1;
+                    if (abs(x - spiralOriginX) >= spiralLoop + 2) {
+                        spiralStage = 1;
+                        spiralOriginZ = z;
+                        spiralLoop += 2;
 
-                
-                
+                    }
+
+                }
             }
-            
+
+            if (generatedOneChunk) {
+                break;
+            }
+
         }
 
-        std::this_thread::sleep_for(std::chrono::milliseconds(100));
+        std::this_thread::sleep_for(std::chrono::milliseconds(50));
+
     }
+
+
+   
 }
 
 void Level::startChunkGenerationThread() {
-    this->chunkGenOrigin = glm::ivec2(0, 0);
-    chunkGenThread1 = std::thread(&Level::generateChunks, this, 1);
-    chunkGenThread2 = std::thread(&Level::generateChunks, this, 2);
-    chunkGenThread3 = std::thread(&Level::generateChunks, this, 3);
-    chunkGenThread4 = std::thread(&Level::generateChunks, this, 4);
+    
+    
+
+    lastSpiralStartPos = glm::ivec2(chunkGenOriginX.load(), chunkGenOriginY.load());
+
+
+    for (int i = 0; i < 8; i++) {
+        this->chunkGenThreads.push_back(std::thread(&Level::generateChunks, this, i));
+    }
+    
+
 
    
+}
+void Level::resetChunkSpiral() {
+
+
+
+    stopGen.store(true);
+
+    for (std::thread& t : chunkGenThreads) {
+        
+        t.join();
+        
+
+    }
+
+    std::cout << "reset chunk spiral" << std::endl;
+    
+    
+
+
+    this->chunkGenThreads.clear();
+
+    stopGen.store(false);
+
+    std::cout << this->chunkGenOriginX << ", "<< this->chunkGenOriginY << std::endl;
+
+    this->startChunkGenerationThread();
+    
 }
 
 void Level::drawChunks(ShaderProgram& shaderProgram, BlockRegistry& blockRegistry) {
 
 
     
+    
     //std::cout << "dx " << this->chunkGenOrigin.x << std::endl;
 
+    glm::fvec2 currentChunkPos = glm::ivec2(chunkGenOriginX.load(), chunkGenOriginY.load());
+
+    if (glm::distance(currentChunkPos, glm::fvec2(lastSpiralStartPos)) > 4.0f) {
+        this->resetChunkSpiral();
+    }
+     
     chunkstoinitMutex.lock();
 
 
-    if (!this->chunkstoinit.empty()) {
+    for (int i = 0; i < 2; i++) {
+        if (!this->chunkstoinit.empty()) {
 
-        glm::ivec2 chunkToInitPos = this->chunkstoinit.front();
-
-        chunksMutex.lock_shared();
-
-        bool exists = this->chunks.contains(chunkToInitPos);
-
-        chunksMutex.unlock_shared();
-
-        if (exists) {
+            glm::ivec2 chunkToInitPos = this->chunkstoinit.front();
 
             chunksMutex.lock_shared();
 
-            Chunk& chunk = this->chunks.at(chunkToInitPos);
+            bool exists = this->chunks.contains(chunkToInitPos);
 
             chunksMutex.unlock_shared();
 
-            chunk.init();
-            chunk.updateMesh(blockRegistry);
-            chunk.updateVBO();
+            if (exists) {
 
-           
+                chunksMutex.lock();
+
+                Chunk& chunk = this->chunks.at(chunkToInitPos);
+
+                
+
+
+
+
+                chunk.init();
+                chunk.updateMesh(blockRegistry);
+                chunk.updateVBO();
+
+                chunksMutex.unlock();
+
+
+
+            }
+
+            this->chunkstoinit.pop();
+
+
+
 
         }
-
-        this->chunkstoinit.pop();
-
-       
-
-        
     }
 
     chunkstoinitMutex.unlock();
     
 
-    for (int x = -10+this->chunkGenOrigin.x; x < 10 + this->chunkGenOrigin.x; x++) {
-        for (int z = -10 + this->chunkGenOrigin.y; z < 10 + this->chunkGenOrigin.y; z++) {
-            chunksMutex.lock_shared();
+    std::vector<Chunk*> chunksToDraw;
+    chunksMutex.lock();
+    for (int x = -30+this->chunkGenOriginX.load(); x < 30 + this->chunkGenOriginX.load(); x++) {
+        for (int z = -30 + this->chunkGenOriginY.load(); z < 30 + this->chunkGenOriginY.load(); z++) {
+           
             if (this->chunks.contains(glm::ivec2(x, z))) {
                 
                 Chunk& chunk = this->chunks.at(glm::ivec2(x, z));
 
-                /*chunk.generate();
-
-                chunk.init(glm::ivec2(0, 0));
-
-
-
-                chunk.updateMesh(blockRegistry);
-                chunk.updateVBO();*/
                 if (chunk.initialized) {
-                    chunk.draw(shaderProgram);
+                    chunksToDraw.push_back(&chunk);
+                   
                 }
 
                 
             }
 
-            chunksMutex.unlock_shared();
+            
            
 
         }
+    }
+    chunksMutex.unlock();
+
+    for (Chunk* c : chunksToDraw) {
+        c->draw(shaderProgram);
     }
     
 

@@ -20,33 +20,45 @@
 #include <shared_mutex>
 #include <mutex>
 #include <queue>
+#include <random>
+#include <atomic>
 #include "../worldgen/worldgen.h"
+
 
 class Level {
 public:
 	std::unordered_map<glm::ivec2, Chunk> chunks;
 	std::shared_mutex chunksMutex;
 	std::mutex chunkstoinitMutex;
-	std::thread chunkGenThread1;
-	std::thread chunkGenThread2;
-	std::thread chunkGenThread3;
-	std::thread chunkGenThread4;
-	glm::ivec2 chunkGenOrigin;
+	std::vector<std::thread> chunkGenThreads;
+
+	std::atomic<int> chunkGenOriginX{ 0 };
+	std::atomic<int> chunkGenOriginY{ 0 };
+
+
+	glm::ivec2 lastSpiralStartPos;
 
 	std::queue<glm::ivec2> chunkstoinit;
 
 	WorldGen worldGen;
 
-	bool doneGame = false;
+	glm::ivec2 chunkgencurrentorg;
+
+	std::atomic<bool> stopGen{ false };
+
+
 
 
 
 	Level();
 
-	void generateChunks(int quadrant);
+	void generateChunks(int threadId);
+
+
 
 	void startChunkGenerationThread();
 
+	void resetChunkSpiral();
 	
 
 	void drawChunks(ShaderProgram& shaderProgram, BlockRegistry& blockRegistry);

@@ -224,6 +224,8 @@ int Game::init() {
 
     glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
+
+    this->level.stopGen.store(false);
     this->level.startChunkGenerationThread();
 
 
@@ -250,7 +252,7 @@ int Game::run() {
         //this->model = glm::rotate(this->model, glm::radians(15.0f * (float)glfwGetTime()), glm::vec3(0.0f, 1.0f, 0.0f));
 
 
-       
+      
 
 
         
@@ -268,17 +270,29 @@ int Game::run() {
         mx = nx;
         my = ny;
 
+
+
         if (glfwGetKey(win, GLFW_KEY_S))
         {
-            this->camera.pos -= this->camera.directionVec * 0.5f;
+            this->camera.pos -= this->camera.directionVec * 2.0f;
         }
         if (glfwGetKey(win, GLFW_KEY_W))
         {
-            this->camera.pos += this->camera.directionVec * 0.5f;
+            this->camera.pos += this->camera.directionVec * 2.0f;
         }
         if (glfwGetKey(win, GLFW_KEY_ESCAPE))
         {
             glfwSetWindowShouldClose(win, 1);
+        }
+
+        this->level.chunkGenOriginX.store((int)floor(camera.pos.x / 16.0f));
+        this->level.chunkGenOriginY.store((int)floor(camera.pos.z / 16.0f));
+
+        if (glfwGetKey(win, GLFW_KEY_SPACE))
+        {
+
+
+            this->level.resetChunkSpiral();
         }
         
 
@@ -295,11 +309,14 @@ int Game::run() {
 
         this->tex.bind();
 
+        
+
         this->level.drawChunks(shaderProgram1, blockRegistry);
 
-        this->level.chunkGenOrigin.x = (int) floor(camera.pos.x / 16.0f);
-        this->level.chunkGenOrigin.y = (int) floor(camera.pos.z / 16.0f);
-
+        
+        std::cout << "PLAYER CHUNK: ("
+            << (int)floor(camera.pos.x / 16.0f) << ", "
+            << (int)floor(camera.pos.z / 16.0f) << ")\n";
 
 
         glfwPollEvents();
@@ -315,12 +332,16 @@ int Game::run() {
 Game::~Game() {;
     std::cout << "game destructor called\n";
 
-    this->level.doneGame = true;
+    this->level.stopGen.store(true);
 
-    this->level.chunkGenThread1.join();
-    this->level.chunkGenThread2.join();
-    this->level.chunkGenThread3.join();
-    this->level.chunkGenThread4.join();
+    for (std::thread& t : level.chunkGenThreads) {
+        if (t.joinable()) {
+            t.join();
+        }
+        
+    }
+    
+
 
     for (auto& p : this->level.chunks) {
         p.second.destroy();
