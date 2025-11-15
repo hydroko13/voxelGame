@@ -9,6 +9,7 @@ void Texture::init() {
 	glCheckErrorBefore("glGenTextures");
 	glGenTextures(1, &gpu_texture_handle);
 	glCheckErrorAfter("glGenTextures");
+	
 }
 
 void Texture::bind() {
@@ -22,6 +23,9 @@ void Texture::fromImage(Image& image) {
 	glCheckErrorBefore("glTexImage2D");
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, image.width, image.height, 0, GL_RGBA, GL_UNSIGNED_BYTE, (void*)image.getRawData());
 	glCheckErrorAfter("glTexImage2D");
+	glCheckErrorBefore("glGenerateMipmap");
+	glGenerateMipmap(GL_TEXTURE_2D);
+	glCheckErrorAfter("glGenerateMipmap");
 
 }
 

@@ -11,8 +11,6 @@ void Chunk::init() {
     model = glm::mat4(1.0f);
     model = glm::translate(model, glm::fvec3(16.0f * chunkPos.x, 0.0f, 16.0f * chunkPos.y));
 
-
-  
     
 
     this->vao.init();

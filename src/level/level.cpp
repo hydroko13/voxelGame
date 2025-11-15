@@ -129,15 +129,31 @@ void Level::drawChunks(ShaderProgram& shaderProgram, BlockRegistry& blockRegistr
 
         chunksMutex.lock_shared();
 
-        Chunk& chunk = this->chunks.at(chunkToInitPos);
+        bool exists = this->chunks.contains(chunkToInitPos);
 
         chunksMutex.unlock_shared();
 
-        chunk.init();
-        chunk.updateMesh(blockRegistry);
-        chunk.updateVBO();
+        if (exists) {
+
+            chunksMutex.lock_shared();
+
+            Chunk& chunk = this->chunks.at(chunkToInitPos);
+
+            chunksMutex.unlock_shared();
+
+            chunk.init();
+            chunk.updateMesh(blockRegistry);
+            chunk.updateVBO();
+
+           
+
+        }
 
         this->chunkstoinit.pop();
+
+       
+
+        
     }
 
     chunkstoinitMutex.unlock();
