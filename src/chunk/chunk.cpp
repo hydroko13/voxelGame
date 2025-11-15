@@ -1,13 +1,15 @@
 #include "chunk.h"
 
-Chunk::Chunk() {
-    
+Chunk::Chunk(glm::ivec2 pos) {
+    model = glm::mat4(1.0f);
+    this->chunkPos = pos;
+
 }
 
-void Chunk::init(glm::ivec2 pos) {
-    
+void Chunk::init() {
 
-    this->chunkPos = pos;
+    model = glm::mat4(1.0f);
+    model = glm::translate(model, glm::fvec3(16.0f * chunkPos.x, 0.0f, 16.0f * chunkPos.y));
 
 
   
@@ -42,6 +44,7 @@ void Chunk::init(glm::ivec2 pos) {
 
     this->vao.unbind();
 
+    initialized = true;
     
 
    
@@ -85,7 +88,6 @@ void Chunk::updateMesh(BlockRegistry& blockRegistry) {
 
                     //this->vertices[8] = std::get<0>(coords);
                     //this->vertices[9] = std::get<3>(coords);
-
                     //this->vertices[13] = std::get<2>(coords);
                     //this->vertices[14] = std::get<3>(coords);
 
@@ -103,10 +105,10 @@ void Chunk::updateMesh(BlockRegistry& blockRegistry) {
 
                     if (include_south_face) {
                         float verts[20] = {
-                           0.0f + this->chunkPos.x * 16.0f + (float)x, 0.0f + (float)y, 0.0f + this->chunkPos.y * 16.0f + (float)z,    std::get<2>(texcoords2), std::get<1>(texcoords2),
-                           0.0f + this->chunkPos.x * 16.0f + (float)x, 1.0f + (float)y, 0.0f + this->chunkPos.y * 16.0f + (float)z,     std::get<2>(texcoords2), std::get<3>(texcoords2),
-                           1.0f + this->chunkPos.x * 16.0f + (float)x, 1.0f + (float)y, 0.0f + this->chunkPos.y * 16.0f + (float)z,      std::get<0>(texcoords2), std::get<3>(texcoords2),
-                           1.0f + this->chunkPos.x * 16.0f + (float)x, 0.0f + (float)y, 0.0f + this->chunkPos.y * 16.0f + (float)z,     std::get<0>(texcoords2), std::get<1>(texcoords2)
+                           0.0f + (float)x, 0.0f + (float)y, 0.0f + (float)z,    std::get<2>(texcoords2), std::get<1>(texcoords2),
+                           0.0f + (float)x, 1.0f + (float)y, 0.0f + (float)z,     std::get<2>(texcoords2), std::get<3>(texcoords2),
+                           1.0f + (float)x, 1.0f + (float)y, 0.0f + (float)z,      std::get<0>(texcoords2), std::get<3>(texcoords2),
+                           1.0f + (float)x, 0.0f + (float)y, 0.0f + (float)z,     std::get<0>(texcoords2), std::get<1>(texcoords2)
 
                         };
 
@@ -128,10 +130,10 @@ void Chunk::updateMesh(BlockRegistry& blockRegistry) {
 
                     if (include_north_face) {
                         float verts[20] = {
-                           0.0f + this->chunkPos.x * 16.0f + (float)x, 0.0f + (float)y, 1.0f + this->chunkPos.y * 16.0f + (float)z,    std::get<0>(texcoords1), std::get<1>(texcoords1),
-                           0.0f + this->chunkPos.x * 16.0f + (float)x, 1.0f + (float)y, 1.0f + this->chunkPos.y * 16.0f + (float)z,     std::get<0>(texcoords1), std::get<3>(texcoords1),
-                           1.0f + this->chunkPos.x * 16.0f + (float)x, 1.0f + (float)y, 1.0f + this->chunkPos.y * 16.0f + (float)z,      std::get<2>(texcoords1), std::get<3>(texcoords1),
-                           1.0f + this->chunkPos.x * 16.0f + (float)x, 0.0f + (float)y, 1.0f + this->chunkPos.y * 16.0f + (float)z,     std::get<2>(texcoords1), std::get<1>(texcoords1)
+                           0.0f + (float)x, 0.0f + (float)y, 1.0f + (float)z,    std::get<0>(texcoords1), std::get<1>(texcoords1),
+                           0.0f + (float)x, 1.0f + (float)y, 1.0f + (float)z,     std::get<0>(texcoords1), std::get<3>(texcoords1),
+                           1.0f + (float)x, 1.0f + (float)y, 1.0f + (float)z,      std::get<2>(texcoords1), std::get<3>(texcoords1),
+                           1.0f + (float)x, 0.0f + (float)y, 1.0f + (float)z,     std::get<2>(texcoords1), std::get<1>(texcoords1)
 
                         };
 
@@ -153,10 +155,10 @@ void Chunk::updateMesh(BlockRegistry& blockRegistry) {
 
                     if (include_east_face) {
                         float verts[20] = {
-                           1.0f + this->chunkPos.x * 16.0f + (float)x, 0.0f + (float)y, 0.0f + this->chunkPos.y * 16.0f + (float)z,    std::get<2>(texcoords3), std::get<1>(texcoords3),
-                           1.0f + this->chunkPos.x * 16.0f + (float)x, 0.0f + (float)y, 1.0f + this->chunkPos.y * 16.0f + (float)z,     std::get<0>(texcoords3), std::get<1>(texcoords3),
-                           1.0f + this->chunkPos.x * 16.0f + (float)x, 1.0f + (float)y, 1.0f + this->chunkPos.y * 16.0f + (float)z,      std::get<0>(texcoords3), std::get<3>(texcoords3),
-                           1.0f + this->chunkPos.x * 16.0f + (float)x, 1.0f + (float)y, 0.0f + this->chunkPos.y * 16.0f + (float)z,     std::get<2>(texcoords3), std::get<3>(texcoords3)
+                           1.0f + (float)x, 0.0f + (float)y, 0.0f + (float)z,    std::get<2>(texcoords3), std::get<1>(texcoords3),
+                           1.0f + (float)x, 0.0f + (float)y, 1.0f + (float)z,     std::get<0>(texcoords3), std::get<1>(texcoords3),
+                           1.0f + (float)x, 1.0f + (float)y, 1.0f + (float)z,      std::get<0>(texcoords3), std::get<3>(texcoords3),
+                           1.0f + (float)x, 1.0f + (float)y, 0.0f + (float)z,     std::get<2>(texcoords3), std::get<3>(texcoords3)
 
                         };
 
@@ -178,10 +180,10 @@ void Chunk::updateMesh(BlockRegistry& blockRegistry) {
 
                     if (include_west_face) {
                         float verts[20] = {
-                           0.0f + this->chunkPos.x * 16.0f + (float)x, 0.0f + (float)y, 0.0f + this->chunkPos.y * 16.0f + (float)z,    std::get<0>(texcoords4), std::get<1>(texcoords4),
-                           0.0f + this->chunkPos.x * 16.0f + (float)x, 0.0f + (float)y, 1.0f + this->chunkPos.y * 16.0f + (float)z,     std::get<2>(texcoords4), std::get<1>(texcoords4),
-                           0.0f + this->chunkPos.x * 16.0f + (float)x, 1.0f + (float)y, 1.0f + this->chunkPos.y * 16.0f + (float)z,      std::get<2>(texcoords4), std::get<3>(texcoords4),
-                           0.0f + this->chunkPos.x * 16.0f + (float)x, 1.0f + (float)y, 0.0f + this->chunkPos.y * 16.0f + (float)z,     std::get<0>(texcoords4), std::get<3>(texcoords4),
+                           0.0f + (float)x, 0.0f + (float)y, 0.0f + (float)z,    std::get<0>(texcoords4), std::get<1>(texcoords4),
+                           0.0f + (float)x, 0.0f + (float)y, 1.0f + (float)z,     std::get<2>(texcoords4), std::get<1>(texcoords4),
+                           0.0f + (float)x, 1.0f + (float)y, 1.0f + (float)z,      std::get<2>(texcoords4), std::get<3>(texcoords4),
+                           0.0f + (float)x, 1.0f + (float)y, 0.0f + (float)z,     std::get<0>(texcoords4), std::get<3>(texcoords4),
 
                         };
 
@@ -203,10 +205,10 @@ void Chunk::updateMesh(BlockRegistry& blockRegistry) {
 
                     if (include_bottom_face) {
                         float verts[20] = {
-                           0.0f + this->chunkPos.x * 16.0f + (float)x, 0.0f + (float)y, 1.0f + this->chunkPos.y * 16.0f + (float)z,    std::get<2>(texcoords5), std::get<1>(texcoords5),
-                           0.0f + this->chunkPos.x * 16.0f + (float)x, 0.0f + (float)y, 0.0f + this->chunkPos.y * 16.0f + (float)z,     std::get<2>(texcoords5), std::get<3>(texcoords5),
-                           1.0f + this->chunkPos.x * 16.0f + (float)x, 0.0f + (float)y, 0.0f + this->chunkPos.y * 16.0f + (float)z,      std::get<0>(texcoords5), std::get<3>(texcoords5),
-                           1.0f + this->chunkPos.x * 16.0f + (float)x, 0.0f + (float)y, 1.0f + this->chunkPos.y * 16.0f + (float)z,     std::get<0>(texcoords5), std::get<1>(texcoords5)
+                           0.0f + (float)x, 0.0f + (float)y, 1.0f + (float)z,    std::get<2>(texcoords5), std::get<1>(texcoords5),
+                           0.0f + (float)x, 0.0f + (float)y, 0.0f + (float)z,     std::get<2>(texcoords5), std::get<3>(texcoords5),
+                           1.0f + (float)x, 0.0f + (float)y, 0.0f + (float)z,      std::get<0>(texcoords5), std::get<3>(texcoords5),
+                           1.0f + (float)x, 0.0f + (float)y, 1.0f + (float)z,     std::get<0>(texcoords5), std::get<1>(texcoords5)
 
                         };
 
@@ -228,10 +230,10 @@ void Chunk::updateMesh(BlockRegistry& blockRegistry) {
 
                     if (include_top_face) {
                         float verts[20] = {
-                           0.0f + this->chunkPos.x * 16.0f + (float)x, 1.0f + (float)y, 1.0f + this->chunkPos.y * 16.0f + (float)z,    std::get<0>(texcoords6), std::get<1>(texcoords6),
-                           0.0f + this->chunkPos.x * 16.0f + (float)x, 1.0f + (float)y, 0.0f + this->chunkPos.y * 16.0f + (float)z,     std::get<0>(texcoords6), std::get<3>(texcoords6),
-                           1.0f + this->chunkPos.x * 16.0f + (float)x, 1.0f + (float)y, 0.0f + this->chunkPos.y * 16.0f + (float)z,      std::get<2>(texcoords6), std::get<3>(texcoords6),
-                           1.0f + this->chunkPos.x * 16.0f + (float)x, 1.0f + (float)y, 1.0f + this->chunkPos.y * 16.0f + (float)z,     std::get<2>(texcoords6), std::get<1>(texcoords6)
+                           0.0f + (float)x, 1.0f + (float)y, 1.0f + (float)z,    std::get<0>(texcoords6), std::get<1>(texcoords6),
+                           0.0f + (float)x, 1.0f + (float)y, 0.0f + (float)z,     std::get<0>(texcoords6), std::get<3>(texcoords6),
+                           1.0f + (float)x, 1.0f + (float)y, 0.0f + (float)z,      std::get<2>(texcoords6), std::get<3>(texcoords6),
+                           1.0f + (float)x, 1.0f + (float)y, 1.0f + (float)z,     std::get<2>(texcoords6), std::get<1>(texcoords6)
 
                         };
 
@@ -274,8 +276,9 @@ void Chunk::updateVBO() {
     this->ebo.setData((void*)this->indices.data(), sizeof(unsigned int) * this->indices.size());
 }
 
-void Chunk::draw() {
+void Chunk::draw(ShaderProgram& shaderProgram) {
 
+    shaderProgram.setMat4f("model", this->model);
     this->vao.bind();
     glCheckErrorBefore("glDrawElements");
     glDrawElements(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0);
@@ -290,14 +293,34 @@ void Chunk::destroy() {
     this->ebo.destroy();
 }
 
-void Chunk::generate() {
+void Chunk::generate(WorldGen& worldgen) {
 
     for (int y = 0; y < 256; y++) {
         for (int x = 0; x < 16; x++) {
             for (int z = 0; z < 16; z++) {
-                this->data.setBlock(glm::ivec3(x, y, z), 2);
+
+                glm::ivec3 blockPos = glm::ivec3(x + chunkPos.x * 16, y, z + chunkPos.y * 16);
+                
+                
+                int h = worldgen.blockHeightAt(glm::ivec2(blockPos.x, blockPos.z));
+                if (y == h) {
+                    this->data.setBlock(glm::ivec3(x, y, z), 2);
+                }
+
+                else if (y < h && y > h - 5) {
+                    this->data.setBlock(glm::ivec3(x, y, z), 3);
+                }
+
+                else if (y < h && y <= h - 5) {
+                    this->data.setBlock(glm::ivec3(x, y, z), 4);
+                }
+
+
+                
+                
             }
         }
     }
+    generated = true;
 }
 

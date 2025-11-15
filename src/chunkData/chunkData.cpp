@@ -2,7 +2,7 @@
 
 
 ChunkData::ChunkData() {
-    this->data = (unsigned char*) malloc(16 * 16 * 256 * 1);
+    this->data = new unsigned char[16 * 16 * 256 * 1];
 
     for (int y = 0; y < 256; y++) {
         for (int x = 0; x < 16; x++)
@@ -19,7 +19,7 @@ ChunkData::ChunkData() {
 
 
 ChunkData::~ChunkData() {
-    free(this->data);
+    delete[] this->data;
 }
 
 void ChunkData::setBlock(glm::ivec3 blockPos, unsigned int blockID) {

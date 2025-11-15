@@ -13,7 +13,9 @@
 #include "../elementBuffer/elementBuffer.h"
 #include "../vertexArray/vertexArray.h"
 #include "../chunkData/chunkData.h"
-#include <tuple>
+#include "../shaderProgram/shaderProgram.h"
+#include "../worldgen/worldgen.h"
+#include <tuple>	
 
 
 
@@ -25,17 +27,17 @@ public:
 	VertexBuffer vbo;
 	ElementBuffer ebo;
 	VertexArray vao;
-
-
-
+	glm::mat4 model;
+	bool initialized = false;
+	bool generated = false;
 
 	std::vector<float> vertices;
 	std::vector<unsigned int> indices;
 
 
-	Chunk();
+	Chunk(glm::ivec2 pos);
 
-	void generate();
+	void generate(WorldGen& worldgen);
 
 	void updateVBO();
 
@@ -43,9 +45,9 @@ public:
 
 	void destroy();
 
-	void draw();
+	void draw(ShaderProgram& shaderProgram);
 
-	void init(glm::ivec2 pos);
+	void init();
 
 
 };

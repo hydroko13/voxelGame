@@ -19,7 +19,11 @@
 #include "../blockRegistry/blockRegistry.h"
 #include "../block/block.h"
 #include "../chunk/chunk.h"
+#include "../level/level.h"
+#include <chrono>
 #include <cmath>
+
+
 
 
 class Game {
@@ -50,9 +54,9 @@ class Game {
         double my;
 
         glm::mat4 proj;
-        glm::mat4 model;
+        
+        Level level;
 
-        Chunk chunk;
 
         Game();
         ~Game();

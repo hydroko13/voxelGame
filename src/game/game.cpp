@@ -147,6 +147,8 @@ int Game::init() {
 
     blockRegistry.registerBlock(1, Block(imageAtlas, "debug_block_top.png", "debug_block_bottom.png", "debug_block_north.png", "debug_block_south.png", "debug_block_west.png", "debug_block_east.png"));
     blockRegistry.registerBlock(2, Block(imageAtlas, "grass_block_top.png", "grass_block_bottom.png", "grass_block_side.png", "grass_block_side.png", "grass_block_side.png", "grass_block_side.png"));
+    blockRegistry.registerBlock(3, Block(imageAtlas, "dirt.png", "dirt.png", "dirt.png", "dirt.png", "dirt.png", "dirt.png"));
+    blockRegistry.registerBlock(4, Block(imageAtlas, "stone.png", "stone.png", "stone.png", "stone.png", "stone.png", "stone.png"));
 
 
     auto coords = imageAtlas.getTexCoords("debug_block_bottom.png");
@@ -200,7 +202,6 @@ int Game::init() {
 
    
     this->proj = glm::mat4(1.0f);
-    this->model = glm::mat4(1.0f);
 
 
     this->camera = Camera();
@@ -210,11 +211,10 @@ int Game::init() {
     this->shaderProgram1.use();
 
     
-    this->proj = glm::perspective(glm::radians(90.0f), ((float)winSize.x) / ((float)winSize.y), 0.1f, 100.0f);
+    this->proj = glm::perspective(glm::radians(90.0f), ((float)winSize.x) / ((float)winSize.y), 0.1f, 800.0f);
 
-    this->model = glm::translate(this->model, glm::vec3(0.0f, 0.0f, 0.5f));
 
-    this->camera.pos = glm::vec3(0.0f, 0.0f, 5.0f);
+    this->camera.pos = glm::vec3(0.0f, 70.0f, 5.0f);
 
     //this->camera.pos = glm::vec3(0.0f, 0.0f, 3.0f);
 
@@ -224,14 +224,8 @@ int Game::init() {
 
     glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-    chunk.generate();
+    this->level.startChunkGenerationThread();
 
-    chunk.init(glm::ivec2(0, 0));
-    
-
-
-    chunk.updateMesh(blockRegistry);
-    chunk.updateVBO();
 
 
     return 0;
@@ -249,10 +243,6 @@ int Game::run() {
 
 
         this->shaderProgram1.use();
-
-        this->model = glm::mat4(1.0f);
-
-        this->model = glm::translate(this->model, glm::vec3(0.0f, 0.0f, 0.5f));
 
         
        
@@ -301,11 +291,14 @@ int Game::run() {
 
         this->shaderProgram1.setMat4f("view", this->camera.viewMat);
 
-        this->shaderProgram1.setMat4f("model", model);
+        
 
         this->tex.bind();
 
-        chunk.draw();
+        this->level.drawChunks(shaderProgram1, blockRegistry);
+
+        this->level.chunkGenOrigin.x = (int) floor(camera.pos.x / 16.0f);
+        this->level.chunkGenOrigin.y = (int) floor(camera.pos.z / 16.0f);
 
 
 
@@ -313,12 +306,27 @@ int Game::run() {
         glfwSwapBuffers(win);
     }
 
+    
    
+
     return 0;
 }
 
 Game::~Game() {;
     std::cout << "game destructor called\n";
+
+    this->level.doneGame = true;
+
+    this->level.chunkGenThread1.join();
+    this->level.chunkGenThread2.join();
+    this->level.chunkGenThread3.join();
+    this->level.chunkGenThread4.join();
+
+    for (auto& p : this->level.chunks) {
+        p.second.destroy();
+    }
+
+
     this->shaderProgram1.destroy();
 
     glfwTerminate();

@@ -18,9 +18,14 @@ public:
 
 	ChunkData();
 
+	ChunkData(const ChunkData&) = delete;
+	ChunkData& operator=(const ChunkData&) = delete;
+
 	~ChunkData();
 
 	unsigned char getBlock(glm::ivec3 blockPos);
+
+
 	void setBlock(glm::ivec3 blockPos, unsigned int blockID);
 
 
