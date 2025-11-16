@@ -99,12 +99,15 @@ int Game::init() {
         return 1;
     }
 
+   
+
+
     vertShader.destroy();
     fragShader.destroy();
 
-    this->shaderProgram1.use();
 
     
+    this->shaderProgram1.use();
 
     ImageAtlas imageAtlas;
 
@@ -151,7 +154,6 @@ int Game::init() {
     blockRegistry.registerBlock(4, Block(imageAtlas, "stone.png", "stone.png", "stone.png", "stone.png", "stone.png", "stone.png"));
 
 
-    auto coords = imageAtlas.getTexCoords("debug_block_bottom.png");
 
     //this->vertices[3] = std::get<0>(coords);
     //this->vertices[4] = std::get<1>(coords);
@@ -168,6 +170,7 @@ int Game::init() {
     
 
     this->shaderProgram1.setInt("tex1", 1);
+    this->shaderProgram1.setFloat("drawBlack", 0.0f);
 
     /*this->VBO.init(GL_STATIC_DRAW);
 
@@ -228,7 +231,9 @@ int Game::init() {
     this->level.stopGen.store(false);
     this->level.startChunkGenerationThread();
 
+   
 
+    blockSelectorBox.init(blockAtlas);
 
     return 0;
 }
@@ -236,7 +241,15 @@ int Game::init() {
 
 int Game::run() {
 
+    this->time = glfwGetTime();
+
     while (!glfwWindowShouldClose(win)) {
+
+
+        double now = glfwGetTime();
+        dt = (float)(now - this->time);
+        this->time = now;
+
 
         glCheckErrorBefore("glClear");
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -272,29 +285,45 @@ int Game::run() {
 
 
 
+
         if (glfwGetKey(win, GLFW_KEY_S))
         {
-            this->camera.pos -= this->camera.directionVec * 2.0f;
+            this->camera.pos -= this->camera.directionVec * 15.0f * dt;
         }
         if (glfwGetKey(win, GLFW_KEY_W))
         {
-            this->camera.pos += this->camera.directionVec * 2.0f;
+            this->camera.pos += this->camera.directionVec * 15.0f * dt;
         }
         if (glfwGetKey(win, GLFW_KEY_ESCAPE))
         {
             glfwSetWindowShouldClose(win, 1);
         }
 
+        for (float step = 0; step < 300; step+=0.02) {
+            glm::fvec3 rayPos = this->camera.pos + this->camera.directionVec * step;
+
+            glm::ivec3 blockPos = glm::round(rayPos);
+
+            if (level.getBlockAt(blockPos) != 0) {
+                this->blockLookingAtPos = blockPos;
+
+                break;
+            }
+            
+
+
+            
+            
+
+        }
+        
+
+        std::cout << this->blockLookingAtPos.x << ", " << this->blockLookingAtPos.y << ", " << this->blockLookingAtPos.z << std::endl;
+
         this->level.chunkGenOriginX.store((int)floor(camera.pos.x / 16.0f));
         this->level.chunkGenOriginY.store((int)floor(camera.pos.z / 16.0f));
 
-        if (glfwGetKey(win, GLFW_KEY_SPACE))
-        {
 
-
-            this->level.resetChunkSpiral();
-        }
-        
 
         this->camera.pitch -= relY * 0.2;
         this->camera.yaw += relX * 0.2;
@@ -313,10 +342,9 @@ int Game::run() {
 
         this->level.drawChunks(shaderProgram1, blockRegistry);
 
-        
-        std::cout << "PLAYER CHUNK: ("
-            << (int)floor(camera.pos.x / 16.0f) << ", "
-            << (int)floor(camera.pos.z / 16.0f) << ")\n";
+        blockSelectorBox.goTo(this->blockLookingAtPos);
+
+        blockSelectorBox.draw(shaderProgram1);
 
 
         glfwPollEvents();
@@ -349,6 +377,7 @@ Game::~Game() {;
 
 
     this->shaderProgram1.destroy();
+
 
     glfwTerminate();
 }

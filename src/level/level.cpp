@@ -12,7 +12,6 @@ void Level::generateChunks(int threadId) {
     
     int x = chunkGenOriginX.load();
     int z = chunkGenOriginY.load();
-    std::cout << "Thread " << threadId << " starting spiral at (" << x << "," << z << ")\n";
     int spiralStage = 0;
     int spiralOriginZ = 0;
     int spiralOriginX = 0;
@@ -194,8 +193,7 @@ void Level::resetChunkSpiral() {
 
     }
 
-    std::cout << "reset chunk spiral" << std::endl;
-    
+
     
 
 
@@ -203,9 +201,55 @@ void Level::resetChunkSpiral() {
 
     stopGen.store(false);
 
-    std::cout << this->chunkGenOriginX << ", "<< this->chunkGenOriginY << std::endl;
 
     this->startChunkGenerationThread();
+    
+}
+
+
+unsigned char Level::getBlockAt(glm::ivec3 blockPos) {
+
+    glm::ivec2 chunkPos(glm::floor((float)blockPos.x / 16), glm::floor((float)blockPos.z / 16));
+
+    chunksMutex.lock();
+
+    bool exists = this->chunks.contains(chunkPos);
+
+    
+
+    if (exists) {
+
+
+        Chunk& chunk = this->chunks.at(chunkPos);
+
+        
+
+        int x = 0;
+        int z = 0;
+
+       
+
+        
+        x = ((blockPos.x % 16) + 16) % 16;
+        z = ((blockPos.z % 16) + 16) % 16;
+        
+
+
+
+        
+        
+        chunksMutex.unlock();
+
+        return chunk.data.getBlock(glm::ivec3(x, blockPos.y, z));
+
+        
+
+    }
+
+    chunksMutex.unlock();
+
+    return 0;
+
     
 }
 
@@ -270,8 +314,8 @@ void Level::drawChunks(ShaderProgram& shaderProgram, BlockRegistry& blockRegistr
 
     std::vector<Chunk*> chunksToDraw;
     chunksMutex.lock();
-    for (int x = -30+this->chunkGenOriginX.load(); x < 30 + this->chunkGenOriginX.load(); x++) {
-        for (int z = -30 + this->chunkGenOriginY.load(); z < 30 + this->chunkGenOriginY.load(); z++) {
+    for (int x = -15+this->chunkGenOriginX.load(); x < 15 + this->chunkGenOriginX.load(); x++) {
+        for (int z = -15 + this->chunkGenOriginY.load(); z < 15 + this->chunkGenOriginY.load(); z++) {
            
             if (this->chunks.contains(glm::ivec2(x, z))) {
                 

@@ -20,8 +20,10 @@
 #include "../block/block.h"
 #include "../chunk/chunk.h"
 #include "../level/level.h"
+#include "../blockSelectorBox/blockSelectorBox.h"
 #include <chrono>
 #include <cmath>
+
 
 
 
@@ -37,24 +39,19 @@ class Game {
         ImageAtlas blockAtlas;
         BlockRegistry blockRegistry;
 
-        float vertices[20] = {
-        -0.5f, -0.5f, 0.0f,    0.0, 0.0f,
-        -0.5f, 0.5f, 0.0f,     0.0, 1.0f,
-        0.5f, 0.5f, 0.0f,      1.0, 1.0f,
-        0.5f, -0.5f, 0.0f,     1.0, 0.0f
-        };
-
-        unsigned int indices[6] = {
-            0, 1, 2,
-            2, 3, 0
-        };
-        
 
         double mx;
         double my;
+        double time = 0.0;
+        float dt;
+
+        glm::ivec3 blockLookingAtPos;
+
 
         glm::mat4 proj;
         
+        BlockSelectorBox blockSelectorBox;
+
         Level level;
 
 
