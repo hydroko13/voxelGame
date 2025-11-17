@@ -50,13 +50,9 @@ void BlockSelectorBox::updateFrame(ImageAtlas& blockAtlas) {
         imgId = "block_overlay0.png";
     }
     else {
-        if (this->destroy_progress < 10) {
-            imgId = "destroy_block_0" + std::to_string(destroy_progress) + ".png";
-        }
-        else {
-            imgId = "destroy_block_" + std::to_string(destroy_progress) + ".png";
-        }
-       
+        imgId = "destroy_block_" + std::to_string(destroy_progress) + ".png";
+        
+
     }
     std::tuple<float, float, float, float> texCoords = blockAtlas.getTexCoords(imgId);
     this->vbo.bind();

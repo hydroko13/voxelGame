@@ -304,7 +304,7 @@ int Game::run() {
             blockDestroyTick += dt;
             if (blockDestroyTick > 0.02f) {
                 this->blockDestroyProgress++;
-                if (blockDestroyProgress > 30) {
+                if (blockDestroyProgress > 8) {
                     this->level.setBlockAt(blockLookingAtPos, 0, blockRegistry);
                     this->blockDestroyProgress = 0;
                     blockDestroyTick = 0.0f;
