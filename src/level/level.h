@@ -54,6 +54,8 @@ public:
 
 	void generateChunks(int threadId);
 
+	void setBlockAt(glm::ivec3 pos, unsigned char blockByte, BlockRegistry& blockRegistry);
+
 	unsigned char getBlockAt(glm::ivec3 blockPos);
 
 

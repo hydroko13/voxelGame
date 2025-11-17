@@ -109,11 +109,9 @@ int Game::init() {
     
     this->shaderProgram1.use();
 
-    ImageAtlas imageAtlas;
 
 
-
-    imageAtlas.init();
+    blockAtlas.init();
 
 
     for (auto f : std::filesystem::recursive_directory_iterator("resources/textures/blocks/")) {
@@ -125,7 +123,7 @@ int Game::init() {
 
                 image.initFromFile(fp);
 
-                imageAtlas.addImg(image, fp.filename().string());
+                blockAtlas.addImg(image, fp.filename().string());
             }
             
         }
@@ -145,13 +143,16 @@ int Game::init() {
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
     glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
 
+    glEnable(GL_BLEND);
+    glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-    tex.fromImage(imageAtlas.img);
 
-    blockRegistry.registerBlock(1, Block(imageAtlas, "debug_block_top.png", "debug_block_bottom.png", "debug_block_north.png", "debug_block_south.png", "debug_block_west.png", "debug_block_east.png"));
-    blockRegistry.registerBlock(2, Block(imageAtlas, "grass_block_top.png", "grass_block_bottom.png", "grass_block_side.png", "grass_block_side.png", "grass_block_side.png", "grass_block_side.png"));
-    blockRegistry.registerBlock(3, Block(imageAtlas, "dirt.png", "dirt.png", "dirt.png", "dirt.png", "dirt.png", "dirt.png"));
-    blockRegistry.registerBlock(4, Block(imageAtlas, "stone.png", "stone.png", "stone.png", "stone.png", "stone.png", "stone.png"));
+    tex.fromImage(blockAtlas.img);
+
+    blockRegistry.registerBlock(1, Block(blockAtlas, "debug_block_top.png", "debug_block_bottom.png", "debug_block_north.png", "debug_block_south.png", "debug_block_west.png", "debug_block_east.png"));
+    blockRegistry.registerBlock(2, Block(blockAtlas, "grass_block_top.png", "grass_block_bottom.png", "grass_block_side.png", "grass_block_side.png", "grass_block_side.png", "grass_block_side.png"));
+    blockRegistry.registerBlock(3, Block(blockAtlas, "dirt.png", "dirt.png", "dirt.png", "dirt.png", "dirt.png", "dirt.png"));
+    blockRegistry.registerBlock(4, Block(blockAtlas, "stone.png", "stone.png", "stone.png", "stone.png", "stone.png", "stone.png"));
 
 
 
@@ -298,15 +299,43 @@ int Game::run() {
         {
             glfwSetWindowShouldClose(win, 1);
         }
+        if (glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_LEFT))
+        {
+            blockDestroyTick += dt;
+            if (blockDestroyTick > 0.02f) {
+                this->blockDestroyProgress++;
+                if (blockDestroyProgress > 30) {
+                    this->level.setBlockAt(blockLookingAtPos, 0, blockRegistry);
+                    this->blockDestroyProgress = 0;
+                    blockDestroyTick = 0.0f;
+                    this->blockSelectorBox.destroy_progress = 0;
+                    this->blockSelectorBox.updateFrame(blockAtlas);
+                }
+                else {
+                    this->blockSelectorBox.destroy_progress = blockDestroyProgress;
+                    this->blockSelectorBox.updateFrame(blockAtlas);
+                }
+                
+                this->blockDestroyTick = 0.0f;
+            }
+        }
+        else {
+            this->blockDestroyProgress = 0;
+            blockDestroyTick = 0.0f;
+            this->blockSelectorBox.destroy_progress = 0;
+            this->blockSelectorBox.updateFrame(blockAtlas);
+        }
 
-        for (float step = 0; step < 300; step+=0.02) {
+        bool foundBlock = false;
+        for (float step = 0; step < 10; step+=0.02) {
             glm::fvec3 rayPos = this->camera.pos + this->camera.directionVec * step;
 
             glm::ivec3 blockPos = glm::round(rayPos);
 
             if (level.getBlockAt(blockPos) != 0) {
                 this->blockLookingAtPos = blockPos;
-
+                lookingAtABlock = true;
+                foundBlock = true;
                 break;
             }
             
@@ -316,9 +345,11 @@ int Game::run() {
             
 
         }
+        if (!foundBlock) {
+
+        }
         
 
-        std::cout << this->blockLookingAtPos.x << ", " << this->blockLookingAtPos.y << ", " << this->blockLookingAtPos.z << std::endl;
 
         this->level.chunkGenOriginX.store((int)floor(camera.pos.x / 16.0f));
         this->level.chunkGenOriginY.store((int)floor(camera.pos.z / 16.0f));

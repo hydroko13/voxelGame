@@ -20,6 +20,7 @@ public:
 	ElementBuffer ebo;
 	VertexArray vao;
 	glm::mat4 model;
+	int destroy_progress = 0;
 
 
 	float vertices[120] = {
@@ -86,6 +87,8 @@ public:
 	void draw(ShaderProgram& shaderProgram);
 
 	void goTo(glm::ivec3 blockPos);
+
+	void updateFrame(ImageAtlas& blockAtlas);
 
 
 	void init(ImageAtlas& blockAtlas);

@@ -39,6 +39,8 @@ class Game {
         ImageAtlas blockAtlas;
         BlockRegistry blockRegistry;
 
+        float blockDestroyTick = 0.0f;
+        int blockDestroyProgress = 0;
 
         double mx;
         double my;
@@ -46,6 +48,7 @@ class Game {
         float dt;
 
         glm::ivec3 blockLookingAtPos;
+        bool lookingAtABlock = false;
 
 
         glm::mat4 proj;
