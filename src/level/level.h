@@ -24,13 +24,14 @@
 #include <atomic>
 #include <map>
 #include "../worldgen/worldgen.h"
+#include <random>
 
 
 class Level {
 public:
 	std::unordered_map<glm::ivec2, Chunk> chunks;
-	std::mutex chunksMutex;
-	std::mutex chunkstoinitMutex;
+	std::shared_mutex chunksMutex;
+	std::shared_mutex chunkstoinitMutex;
 	std::vector<std::thread> chunkGenThreads;
 
 	std::atomic<int> chunkGenOriginX{ 0 };
