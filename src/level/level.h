@@ -22,13 +22,14 @@
 #include <queue>
 #include <random>
 #include <atomic>
+#include <map>
 #include "../worldgen/worldgen.h"
 
 
 class Level {
 public:
 	std::unordered_map<glm::ivec2, Chunk> chunks;
-	std::shared_mutex chunksMutex;
+	std::mutex chunksMutex;
 	std::mutex chunkstoinitMutex;
 	std::vector<std::thread> chunkGenThreads;
 

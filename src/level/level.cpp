@@ -8,50 +8,9 @@ Level::Level() {
 void Level::generateChunks(int threadId) {
 
 
-    int leftBound = -12;
-    int rightBound = 12;
-    int upBound = 12;
-    int downBound = -12;
-    int xstep = 1;
-    int zstep = 1;
 
 
-    if (threadId == 0) {
-        leftBound = 0;
-        rightBound = 12;
-        upBound = 12;
-        downBound = 0;
-        zstep = 1;
-        xstep = 1;
-    }
-    else if (threadId == 1) {
-        leftBound = 0;
-        rightBound = -12;
-        upBound = 12;
-        downBound = 0;
-        zstep = 1;
-        xstep = -1;
-    }
-    else if (threadId == 2) {
-        leftBound = 0;
-        rightBound = 12;
-        upBound = -12;
-        downBound = 0;
-        zstep = -1;
-        xstep = 1;
-    }
-    else if (threadId == 3) {
-        leftBound = 0;
-        rightBound = -12;
-        upBound = -12;
-        downBound = 0;
-        zstep = -1;
-        xstep = -1;
-    }
 
-   
-
-    std::this_thread::sleep_for(std::chrono::milliseconds(10*threadId));
     
     std::cout << threadId << "\n";
 
@@ -60,70 +19,56 @@ void Level::generateChunks(int threadId) {
 
         int ox = chunkGenOriginX.load();
         int oz = chunkGenOriginY.load();
-        
 
-        for (int x = ox + leftBound; x != ox + rightBound; x+=xstep) {
-            for (int z = oz + downBound; z != oz + upBound; z+=zstep) {
+        std::map<float, glm::ivec2> chunksSorted;
+        chunksMutex.lock();
+        chunkstoinitMutex.lock();
+        for (int x = ox - 10; x < ox + 10; x++) {
+            for (int z = oz - 10; z < oz + 10; z++) {
                 glm::ivec2 cPos(x, z);
-
-
-
-                chunksMutex.lock();
-
-                auto p = this->chunks.try_emplace(cPos, cPos);
-                if (p.second) {
-
-                    Chunk& chunk = p.first->second;
-
-
-
-                    if (!chunk.generated) {
-                        chunk.generate(worldGen);
-
-                    }
-
-
-
-
-                    chunksMutex.unlock();
-
-                    chunkstoinitMutex.lock();
-
-                    this->chunkstoinit.push(cPos);
-
-                    chunkstoinitMutex.unlock();
-
+                float dist = glm::distance(glm::fvec2(cPos), glm::fvec2(ox, oz));
+                if (!chunks.contains(cPos)) {
+                    chunksSorted.try_emplace(dist, x, z);
                 }
-                else {
-                    chunksMutex.unlock();
-                }
-
-
                 
-                std::this_thread::sleep_for(std::chrono::milliseconds(35));
-
             }
         }
+        chunksMutex.unlock();
+        chunkstoinitMutex.unlock();
 
+        
 
+        for (auto& p: chunksSorted) {
+            chunksMutex.lock();
+            
+            auto p2 = this->chunks.try_emplace(p.second, p.second);
+            
+
+            Chunk &chunk = p2.first->second;
+
+            if (!chunk.generated)
+            {
+                chunk.generate(worldGen);
+            }
+            chunksMutex.unlock();
+
+            chunkstoinitMutex.lock();
+            this->chunkstoinit.push(p.second);
+            chunkstoinitMutex.unlock();
            
+            std::this_thread::sleep_for(std::chrono::milliseconds(5));
+            
+        }
         
-
-    
-        
-
-       
-        
-
-
-
-        
-
+        std::this_thread::sleep_for(std::chrono::milliseconds(15));
     }
 
 
-   
 }
+
+
+   
+
 
 void Level::startChunkGenerationThread() {
     
@@ -132,7 +77,7 @@ void Level::startChunkGenerationThread() {
   
 
 
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 1; i++) {
         this->chunkGenThreads.push_back(std::thread(&Level::generateChunks, this, i));
     }
     
@@ -258,8 +203,7 @@ void Level::drawChunks(ShaderProgram& shaderProgram, BlockRegistry& blockRegistr
 
     chunkstoinitMutex.lock();
 
-
-
+    chunksMutex.lock();
 
     for (int i = 0; i < 2; i++) {
         if (!this->chunkstoinit.empty()) {
@@ -269,32 +213,28 @@ void Level::drawChunks(ShaderProgram& shaderProgram, BlockRegistry& blockRegistr
 
            
             
-            chunksMutex.lock_shared();
+            
 
-            bool exists = this->chunks.contains(chunkToInitPos);
+           
 
-            chunksMutex.unlock_shared();
+                
 
-            if (exists) {
-
-                chunksMutex.lock();
-
-                Chunk& chunk = this->chunks.at(chunkToInitPos);
+            Chunk& chunk = this->chunks.at(chunkToInitPos);
 
 
 
 
 
 
-                chunk.init();
-                chunk.updateMesh(blockRegistry);
-                chunk.updateVBO();
+            chunk.init();
+            chunk.updateMesh(blockRegistry);
+            chunk.updateVBO();
 
-                chunksMutex.unlock();
+            
 
 
 
-            }
+            
 
                 
             
@@ -305,6 +245,8 @@ void Level::drawChunks(ShaderProgram& shaderProgram, BlockRegistry& blockRegistr
 
         }
     }
+
+    chunksMutex.unlock();
 
     chunkstoinitMutex.unlock();
     

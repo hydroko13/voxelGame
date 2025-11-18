@@ -302,7 +302,7 @@ int Game::run() {
         if (glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_LEFT))
         {
             blockDestroyTick += dt;
-            if (blockDestroyTick > 0.02f) {
+            if (blockDestroyTick > 0.04f) {
                 this->blockDestroyProgress++;
                 if (blockDestroyProgress > 8) {
                     this->level.setBlockAt(blockLookingAtPos, 0, blockRegistry);
