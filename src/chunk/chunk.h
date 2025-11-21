@@ -36,6 +36,7 @@ public:
 
 
 	Chunk(glm::ivec2 pos);
+	Chunk(const Chunk& chunk);
 
 	void generate(WorldGen& worldgen);
 

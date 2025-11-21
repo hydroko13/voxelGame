@@ -8,157 +8,20 @@ Level::Level() {
 void Level::generateChunks(int threadId) {
 
 
-
-
-
     
-    std::cout << threadId << "\n";
-
-
-    while (!stopGen.load()) {
-
-
-        int ox = chunkGenOriginX.load();
-        int oz = chunkGenOriginY.load();
-
-        std::queue<glm::ivec2> chunksSorted;
-        chunksMutex.lock_shared();
-        
-
-        int leftBound = 8;
-        int rightBound = 8;
-        int upBound = 8;
-        int downBound = 8;
-
-
-
-        if (threadId == 0) {
-            leftBound = 8;
-            rightBound = 0;
-            upBound = 8;
-            downBound = 0;
-        }
-        if (threadId == 1)
-        {
-            leftBound = 0;
-            rightBound = 8;
-            upBound = 0;
-            downBound = 8;
-        }
-        if (threadId == 2)
-        {
-            leftBound = 0;
-            rightBound = 8;
-            upBound = 8;
-            downBound = 0;
-        }
-        if (threadId == 3)
-        {
-            leftBound = 8;
-            rightBound = 0;
-            upBound = 0;
-            downBound = 8;
-        }
-        for (int x = ox - leftBound; x < ox + rightBound; x++)
-        {
-            for (int z = oz - upBound; z < oz + downBound; z++)
-            {
-                glm::ivec2 cPos(x, z);
-
-                if (!chunks.contains(cPos))
-                {
-                    chunksSorted.push(glm::ivec2(x, z));
-                }
-            }
-        }
-    
-        chunksMutex.unlock_shared();
-
-
-
-        while (true) {
-
-            if (chunksSorted.size() == 0) {
-                break;
-            }
-
-            chunksMutex.lock();
-
-            std::vector<Chunk&> chunksToGen;
-
-            for (int i = 0; i < 2; i++)
-            {
-                
-                glm::ivec2& pos = chunksSorted.front();
-
-                
-
-                auto p2 = this->chunks.try_emplace(pos, pos);
-
-                
-
-                Chunk &chunk = p2.first->second;
-
-                chunksToGen.push_back(chunk);
-
-                chunksSorted.pop();
-            }
-            
-
-            for (int i = 0; i < 2; i++)
-            {
-
-                Chunk &chunk = chunksToGen[i];
-                chunk.generate(worldGen);
-                chunkstoinitMutex.lock();
-                this->chunkstoinit.push(chunk.chunkPos);
-                chunkstoinitMutex.unlock();
-
-                
-                if (stopGen.load())
-                {
-                    break;
-                }
-            }
-            chunksMutex.unlock();
-
-        
-            if (stopGen.load())
-            {
-                break;
-            }
-            
-            std::this_thread::sleep_for(std::chrono::milliseconds(500));
-        }
-        
-        
-        if (stopGen.load())
-        {
-            break;
-        }
-    }
 
 
 }
-
-
-   
 
 
 void Level::startChunkGenerationThread() {
     
     
 
-  
-
-
-    for (int i = 0; i < 4; i++) {
+    for (int i = 0; i < 1; i++) {
         this->chunkGenThreads.push_back(std::thread(&Level::generateChunks, this, i));
     }
     
-
-
-   
 }
 
 
@@ -167,7 +30,7 @@ unsigned char Level::getBlockAt(glm::ivec3 blockPos) {
 
     glm::ivec2 chunkPos(glm::floor((float)blockPos.x / 16), glm::floor((float)blockPos.z / 16));
 
-    chunksMutex.lock();
+    
 
     bool exists = this->chunks.contains(chunkPos);
 
@@ -194,7 +57,7 @@ unsigned char Level::getBlockAt(glm::ivec3 blockPos) {
 
         
         
-        chunksMutex.unlock();
+       
 
         return chunk.data.getBlock(glm::ivec3(x, blockPos.y, z));
 
@@ -202,7 +65,6 @@ unsigned char Level::getBlockAt(glm::ivec3 blockPos) {
 
     }
 
-    chunksMutex.unlock();
 
     return 0;
 
@@ -212,7 +74,6 @@ void Level::setBlockAt(glm::ivec3 pos, unsigned char blockByte, BlockRegistry& b
 
     glm::ivec2 chunkPos(glm::floor((float)pos.x / 16), glm::floor((float)pos.z / 16));
 
-    chunksMutex.lock();
 
     bool exists = this->chunks.contains(chunkPos);
 
@@ -248,116 +109,48 @@ void Level::setBlockAt(glm::ivec3 pos, unsigned char blockByte, BlockRegistry& b
 
 
     }
-
-    chunksMutex.unlock();
-
-
 }
 
 void Level::drawChunks(ShaderProgram& shaderProgram, BlockRegistry& blockRegistry) {
 
+    for (int x = (this->chunkGenOrigin.x - 12); x < (this->chunkGenOrigin.x + 12); x++)
+    {
+        for (int z = (this->chunkGenOrigin.y - 12); z < (this->chunkGenOrigin.y + 12); z++)
+        {
+            Chunk chunk(glm::ivec2(x, z));
 
-    //chunksMutex.lock();
-    //for (auto& p : this->chunks) {
-    //    float dist = glm::distance(glm::fvec2(p.second.chunkPos), glm::fvec2(this->chunkGenOriginX.load(), this->chunkGenOriginY.load()));
-    //    if (dist > 5.0f) {
-    //        p.second.destroy();
-
-    //        this->chunks.erase(p.second.chunkPos);
-
-    //    }
-    //    
-    //}
-    //chunksMutex.unlock();
-
-
-
-    
-    
-    //std::cout << "dx " << this->chunkGenOrigin.x << std::endl;
-
-    chunkstoinitMutex.lock();
-
-    chunksMutex.lock();
-
-    for (int i = 0; i < 2; i++) {
-        if (!this->chunkstoinit.empty()) {
-
-            glm::ivec2 chunkToInitPos = this->chunkstoinit.front();
-
-
-           
-            
-            
-
-           
-
-                
-
-            Chunk& chunk = this->chunks.at(chunkToInitPos);
-
-
-
-
-
-
+            chunk.generate(worldGen);
             chunk.init();
             chunk.updateMesh(blockRegistry);
             chunk.updateVBO();
 
-            
 
-
-
-            
-
-                
-            
-            this->chunkstoinit.pop();
-
-
-
-
+            this->chunks.try_emplace(glm::ivec2(x, z), chunk);
         }
     }
 
-    chunksMutex.unlock();
 
-    chunkstoinitMutex.unlock();
-    
+    std::vector<Chunk *> chunksToDraw;
+    for (int x = (this->chunkGenOrigin.x - 12); x < (this->chunkGenOrigin.x + 12); x++)
+    {
+        for (int z = (this->chunkGenOrigin.y - 12); z < (this->chunkGenOrigin.y + 12); z++)
+        {
 
-    std::vector<Chunk*> chunksToDraw;
-    chunksMutex.lock();
-    for (int x =  this->chunkGenOriginX.load()-12; x < this->chunkGenOriginX.load() + 12; x++) {
-        for (int z = this->chunkGenOriginY.load()-12; z < this->chunkGenOriginY.load() + 12; z++) {
-           
-           
-            
-            if (this->chunks.contains(glm::ivec2(x, z))) {
+            if (this->chunks.contains(glm::ivec2(x, z)))
+            {
 
-                Chunk& chunk = this->chunks.at(glm::ivec2(x, z));
+                Chunk &chunk = this->chunks.at(glm::ivec2(x, z));
 
-                if (chunk.initialized) {
+                if (chunk.initialized)
+                {
                     chunksToDraw.push_back(&chunk);
-
                 }
-
-
             }
-            
-            
-
-            
-           
-
         }
     }
-    chunksMutex.unlock();
 
-    for (Chunk* c : chunksToDraw) {
+    for (Chunk *c : chunksToDraw)
+    {
         c->draw(shaderProgram);
     }
-    
-
-   
 }

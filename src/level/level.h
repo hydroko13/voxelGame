@@ -30,23 +30,20 @@
 class Level {
 public:
 	std::unordered_map<glm::ivec2, Chunk> chunks;
-	std::shared_mutex chunksMutex;
-	std::shared_mutex chunkstoinitMutex;
+	std::mutex chunksToInitMutex;
+	std::mutex chunksToGenMutex;
 	std::vector<std::thread> chunkGenThreads;
 
-	std::atomic<int> chunkGenOriginX{ 0 };
-	std::atomic<int> chunkGenOriginY{ 0 };
+	glm::ivec2 chunkGenOrigin{ 0, 0 };
 
-
-	glm::ivec2 lastSpiralStartPos;
-
-	std::queue<glm::ivec2> chunkstoinit;
+	std::queue<Chunk> chunksToInit;
+	std::queue<glm::ivec2> chunksToGen;
 
 	WorldGen worldGen;
 
 	glm::ivec2 chunkgencurrentorg;
 
-	std::atomic<bool> stopGen{ false };
+	bool stopGen = false;
 
 
 
@@ -61,10 +58,7 @@ public:
 	unsigned char getBlockAt(glm::ivec3 blockPos);
 
 
-	void startChunkGenerationThread();
-
-	void resetChunkSpiral();
-	
+	void startChunkGenerationThread();	
 
 	void drawChunks(ShaderProgram& shaderProgram, BlockRegistry& blockRegistry);
 

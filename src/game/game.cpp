@@ -53,7 +53,8 @@ int Game::init() {
     }
 
     glCheckErrorBefore("glViewport");
-    glViewport(0, 0, winSize.x, winSize.y);
+    bool > stopGe
+               glViewport(0, 0, winSize.x, winSize.y);
     glCheckErrorAfter("glViewport");
 
 
@@ -228,11 +229,8 @@ int Game::init() {
 
     glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
-
-    this->level.stopGen.store(false);
+    this->level.stopGen = false;
     this->level.startChunkGenerationThread();
-
-   
 
     blockSelectorBox.init(blockAtlas);
 
@@ -299,60 +297,59 @@ int Game::run() {
         {
             glfwSetWindowShouldClose(win, 1);
         }
-        if (glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_LEFT))
-        {
-            blockDestroyTick += dt;
-            if (blockDestroyTick > 0.04f) {
-                this->blockDestroyProgress++;
-                if (blockDestroyProgress > 8) {
-                    this->level.setBlockAt(blockLookingAtPos, 0, blockRegistry);
-                    this->blockDestroyProgress = 0;
-                    blockDestroyTick = 0.0f;
-                    this->blockSelectorBox.destroy_progress = 0;
-                    this->blockSelectorBox.updateFrame(blockAtlas);
-                }
-                else {
-                    this->blockSelectorBox.destroy_progress = blockDestroyProgress;
-                    this->blockSelectorBox.updateFrame(blockAtlas);
-                }
+        // if (glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_LEFT))
+        // {
+        //     blockDestroyTick += dt;
+        //     if (blockDestroyTick > 0.04f) {
+        //         this->blockDestroyProgress++;
+        //         if (blockDestroyProgress > 8) {
+        //             this->level.setBlockAt(blockLookingAtPos, 0, blockRegistry);
+        //             this->blockDestroyProgress = 0;
+        //             blockDestroyTick = 0.0f;
+        //             this->blockSelectorBox.destroy_progress = 0;
+        //             this->blockSelectorBox.updateFrame(blockAtlas);
+        //         }
+        //         else {
+        //             this->blockSelectorBox.destroy_progress = blockDestroyProgress;
+        //             this->blockSelectorBox.updateFrame(blockAtlas);
+        //         }
                 
-                this->blockDestroyTick = 0.0f;
-            }
-        }
-        else {
-            this->blockDestroyProgress = 0;
-            blockDestroyTick = 0.0f;
-            this->blockSelectorBox.destroy_progress = 0;
-            this->blockSelectorBox.updateFrame(blockAtlas);
-        }
+        //         this->blockDestroyTick = 0.0f;
+        //     }
+        // }
+        // else {
+        //     this->blockDestroyProgress = 0;
+        //     blockDestroyTick = 0.0f;
+        //     this->blockSelectorBox.destroy_progress = 0;
+        //     this->blockSelectorBox.updateFrame(blockAtlas);
+        // }
 
-        bool foundBlock = false;
-        for (float step = 0; step < 10; step+=0.02) {
-            glm::fvec3 rayPos = this->camera.pos + this->camera.directionVec * step;
+        // bool foundBlock = false;
+        // for (float step = 0; step < 10; step+=0.02) {
+        //     glm::fvec3 rayPos = this->camera.pos + this->camera.directionVec * step;
 
-            glm::ivec3 blockPos = glm::round(rayPos);
+        //     glm::ivec3 blockPos = glm::round(rayPos);
 
-            if (level.getBlockAt(blockPos) != 0) {
-                this->blockLookingAtPos = blockPos;
-                lookingAtABlock = true;
-                foundBlock = true;
-                break;
-            }
+        //     if (level.getBlockAt(blockPos) != 0) {
+        //         this->blockLookingAtPos = blockPos;
+        //         lookingAtABlock = true;
+        //         foundBlock = true;
+        //         break;
+        //     }
             
 
 
             
             
 
-        }
-        if (!foundBlock) {
+        // }
+        // if (!foundBlock) {
 
-        }
-        
+        // }
+
+        this->level.chunkGenOrigin = glm::ivec2((int)(camera.pos.x / 16.0f), (int)(camera.pos.z / 16.0f));
 
 
-        this->level.chunkGenOriginX.store((int)floor(camera.pos.x / 16.0f));
-        this->level.chunkGenOriginY.store((int)floor(camera.pos.z / 16.0f));
 
 
 
@@ -391,7 +388,7 @@ int Game::run() {
 Game::~Game() {;
     std::cout << "game destructor called\n";
 
-    this->level.stopGen.store(true);
+    this->level.stopGen = true;
 
     for (std::thread& t : level.chunkGenThreads) {
         if (t.joinable()) {
