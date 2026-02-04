@@ -1,0 +1,10 @@
+{
+		
+	"bottom_texture": "debug_block/debug_block_bottom.png",
+	"top_texture": "debug_block/debug_block_top.png",
+	"south_texture": "debug_block/debug_block_south.png",
+	"north_texture": "debug_block/debug_block_north.png",
+	"east_texture": "debug_block/debug_block_east.png",
+	"west_texture": "debug_block/debug_block_west.png",
+	
+}
