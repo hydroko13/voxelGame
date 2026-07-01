@@ -15,7 +15,13 @@ ChunkData::ChunkData() {
     }
 }
 
+ChunkData::ChunkData(const ChunkData& cd)
+{
+    std::cout << "hello world!\n";
+    this->data = new unsigned char[16 * 16 * 256 * 1];
 
+}
+    
 
 
 ChunkData::~ChunkData() {

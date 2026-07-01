@@ -13,18 +13,29 @@ void Level::generateChunks(int threadId) {
 
 }
 
+void Level::genChunks(BlockRegistry &blockRegistry)
+{
 
-void Level::startChunkGenerationThread() {
-    
-    
+    for (int x = (this->chunkGenOrigin.x - 3); x < (this->chunkGenOrigin.x + 3); x++)
+    {
+        for (int z = (this->chunkGenOrigin.y - 3); z < (this->chunkGenOrigin.y + 3); z++)
+        {
+            glm::ivec2 pos(x, z);
+            if (!this->chunks.contains(pos))
+            {
+                Chunk chunk(pos);
 
-    for (int i = 0; i < 1; i++) {
-        this->chunkGenThreads.push_back(std::thread(&Level::generateChunks, this, i));
+                chunk.generate(worldGen);
+                chunk.updateMesh(blockRegistry);
+
+                
+                chunks.try_emplace(pos, std::move(chunk));
+
+
+            }
+        }
     }
-    
 }
-
-
 
 unsigned char Level::getBlockAt(glm::ivec3 blockPos) {
 
@@ -113,22 +124,24 @@ void Level::setBlockAt(glm::ivec3 pos, unsigned char blockByte, BlockRegistry& b
 
 void Level::drawChunks(ShaderProgram& shaderProgram, BlockRegistry& blockRegistry) {
 
-    for (int x = (this->chunkGenOrigin.x - 12); x < (this->chunkGenOrigin.x + 12); x++)
+    for (int x = (this->chunkGenOrigin.x - 4); x < (this->chunkGenOrigin.x + 4); x++)
     {
-        for (int z = (this->chunkGenOrigin.y - 12); z < (this->chunkGenOrigin.y + 12); z++)
+        for (int z = (this->chunkGenOrigin.y - 4); z < (this->chunkGenOrigin.y + 4); z++)
         {
-            Chunk chunk(glm::ivec2(x, z));
 
-            chunk.generate(worldGen);
-            chunk.init();
-            chunk.updateMesh(blockRegistry);
-            chunk.updateVBO();
+            if (this->chunks.contains(glm::ivec2(x, z)))
+            {
 
+                Chunk &chunk = this->chunks.at(glm::ivec2(x, z));
 
-            this->chunks.try_emplace(glm::ivec2(x, z), chunk);
+                if (!chunk.initialized) {
+                    chunk.init();
+                    chunk.updateVBO();
+
+                }
+            }
         }
     }
-
 
     std::vector<Chunk *> chunksToDraw;
     for (int x = (this->chunkGenOrigin.x - 12); x < (this->chunkGenOrigin.x + 12); x++)
@@ -143,6 +156,7 @@ void Level::drawChunks(ShaderProgram& shaderProgram, BlockRegistry& blockRegistr
 
                 if (chunk.initialized)
                 {
+                
                     chunksToDraw.push_back(&chunk);
                 }
             }
@@ -152,5 +166,6 @@ void Level::drawChunks(ShaderProgram& shaderProgram, BlockRegistry& blockRegistr
     for (Chunk *c : chunksToDraw)
     {
         c->draw(shaderProgram);
+        // std::cout << "Helloworld\n";
     }
 }

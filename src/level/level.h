@@ -57,8 +57,7 @@ public:
 
 	unsigned char getBlockAt(glm::ivec3 blockPos);
 
-
-	void startChunkGenerationThread();	
+	void genChunks(BlockRegistry &blockRegistry);
 
 	void drawChunks(ShaderProgram& shaderProgram, BlockRegistry& blockRegistry);
 

@@ -52,9 +52,10 @@ int Game::init() {
         return 1;
     }
 
+    
+
     glCheckErrorBefore("glViewport");
-    bool > stopGe
-               glViewport(0, 0, winSize.x, winSize.y);
+    glViewport(0, 0, winSize.x, winSize.y);
     glCheckErrorAfter("glViewport");
 
 
@@ -230,7 +231,7 @@ int Game::init() {
     glfwSetInputMode(win, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 
     this->level.stopGen = false;
-    this->level.startChunkGenerationThread();
+    this->level.genChunks(blockRegistry);
 
     blockSelectorBox.init(blockAtlas);
 
@@ -390,12 +391,12 @@ Game::~Game() {;
 
     this->level.stopGen = true;
 
-    for (std::thread& t : level.chunkGenThreads) {
-        if (t.joinable()) {
-            t.join();
-        }
+    // for (std::thread& t : level.chunkGenThreads) {
+    //     if (t.joinable()) {
+    //         t.join();
+    //     }
         
-    }
+    // }
     
 
 

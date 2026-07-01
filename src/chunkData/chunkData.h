@@ -12,14 +12,13 @@
 class ChunkData {
 
 private:
-		unsigned char* data;
+		unsigned char* data = nullptr;
 
 public:
 
 	ChunkData();
 
-	ChunkData(const ChunkData&) = delete;
-	ChunkData& operator=(const ChunkData&) = delete;
+	ChunkData(const ChunkData&);
 
 	~ChunkData();
 
