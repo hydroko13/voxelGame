@@ -19,10 +19,12 @@ public:
 	ChunkData();
 
 	ChunkData(const ChunkData&);
+	ChunkData(ChunkData&& c);
+
 
 	~ChunkData();
 
-	unsigned char getBlock(glm::ivec3 blockPos);
+	unsigned char getBlock(glm::ivec3 blockPos) const;
 
 
 	void setBlock(glm::ivec3 blockPos, unsigned int blockID);

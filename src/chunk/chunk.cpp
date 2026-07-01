@@ -6,12 +6,11 @@ Chunk::Chunk(glm::ivec2 pos) {
 
 }
 
-Chunk::Chunk(Chunk&& chunk) {
+Chunk::Chunk(Chunk&& chunk) : data(std::move(chunk.data)) {
 
-    this->chunkPos = chunk.chunkPos;
-    model = glm::mat4(1.0f);
-    model = glm::translate(model, glm::fvec3(16.0f * chunkPos.x, 0.0f, 16.0f * chunkPos.y));
-    this->data = ChunkData(chunk.data);
+    this->chunkPos = glm::ivec2(chunk.chunkPos.x, chunk.chunkPos.y);
+    this->vertices = chunk.vertices;
+    this->indices = chunk.indices;
 
 }
 
@@ -284,6 +283,8 @@ void Chunk::updateVBO() {
 }
 
 void Chunk::draw(ShaderProgram& shaderProgram) {
+
+    std::cout << "Draw" << std::endl;
 
     shaderProgram.setMat4f("model", this->model);
     this->vao.bind();

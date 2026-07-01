@@ -298,52 +298,52 @@ int Game::run() {
         {
             glfwSetWindowShouldClose(win, 1);
         }
-        // if (glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_LEFT))
-        // {
-        //     blockDestroyTick += dt;
-        //     if (blockDestroyTick > 0.04f) {
-        //         this->blockDestroyProgress++;
-        //         if (blockDestroyProgress > 8) {
-        //             this->level.setBlockAt(blockLookingAtPos, 0, blockRegistry);
-        //             this->blockDestroyProgress = 0;
-        //             blockDestroyTick = 0.0f;
-        //             this->blockSelectorBox.destroy_progress = 0;
-        //             this->blockSelectorBox.updateFrame(blockAtlas);
-        //         }
-        //         else {
-        //             this->blockSelectorBox.destroy_progress = blockDestroyProgress;
-        //             this->blockSelectorBox.updateFrame(blockAtlas);
-        //         }
+        if (glfwGetMouseButton(win, GLFW_MOUSE_BUTTON_LEFT))
+        {
+            blockDestroyTick += dt;
+            if (blockDestroyTick > 0.04f) {
+                this->blockDestroyProgress++;
+                if (blockDestroyProgress > 8) {
+                    this->level.setBlockAt(blockLookingAtPos, 0, blockRegistry);
+                    this->blockDestroyProgress = 0;
+                    blockDestroyTick = 0.0f;
+                    this->blockSelectorBox.destroy_progress = 0;
+                    this->blockSelectorBox.updateFrame(blockAtlas);
+                }
+                else {
+                    this->blockSelectorBox.destroy_progress = blockDestroyProgress;
+                    this->blockSelectorBox.updateFrame(blockAtlas);
+                }
                 
-        //         this->blockDestroyTick = 0.0f;
-        //     }
-        // }
-        // else {
-        //     this->blockDestroyProgress = 0;
-        //     blockDestroyTick = 0.0f;
-        //     this->blockSelectorBox.destroy_progress = 0;
-        //     this->blockSelectorBox.updateFrame(blockAtlas);
-        // }
+                this->blockDestroyTick = 0.0f;
+            }
+        }
+        else {
+            this->blockDestroyProgress = 0;
+            blockDestroyTick = 0.0f;
+            this->blockSelectorBox.destroy_progress = 0;
+            this->blockSelectorBox.updateFrame(blockAtlas);
+        }
 
-        // bool foundBlock = false;
-        // for (float step = 0; step < 10; step+=0.02) {
-        //     glm::fvec3 rayPos = this->camera.pos + this->camera.directionVec * step;
+        bool foundBlock = false;
+        for (float step = 0; step < 10; step+=0.02) {
+            glm::fvec3 rayPos = this->camera.pos + this->camera.directionVec * step;
 
-        //     glm::ivec3 blockPos = glm::round(rayPos);
+            glm::ivec3 blockPos = glm::floor(rayPos);
 
-        //     if (level.getBlockAt(blockPos) != 0) {
-        //         this->blockLookingAtPos = blockPos;
-        //         lookingAtABlock = true;
-        //         foundBlock = true;
-        //         break;
-        //     }
+            if (level.getBlockAt(blockPos) != 0) {
+                this->blockLookingAtPos = blockPos;
+                lookingAtABlock = true;
+                foundBlock = true;
+                break;
+            }
             
 
 
             
             
 
-        // }
+        }
         // if (!foundBlock) {
 
         // }

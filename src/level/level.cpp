@@ -16,6 +16,7 @@ void Level::generateChunks(int threadId) {
 void Level::genChunks(BlockRegistry &blockRegistry)
 {
 
+    std::cout << "dad" << std::endl;
     for (int x = (this->chunkGenOrigin.x - 3); x < (this->chunkGenOrigin.x + 3); x++)
     {
         for (int z = (this->chunkGenOrigin.y - 3); z < (this->chunkGenOrigin.y + 3); z++)
@@ -29,7 +30,7 @@ void Level::genChunks(BlockRegistry &blockRegistry)
                 chunk.updateMesh(blockRegistry);
 
                 
-                chunks.try_emplace(pos, std::move(chunk));
+                chunks.emplace(pos, std::move(chunk));
 
 
             }
@@ -137,6 +138,7 @@ void Level::drawChunks(ShaderProgram& shaderProgram, BlockRegistry& blockRegistr
                 if (!chunk.initialized) {
                     chunk.init();
                     chunk.updateVBO();
+                    std::cout << "hello" << std::endl;
 
                 }
             }
@@ -156,7 +158,6 @@ void Level::drawChunks(ShaderProgram& shaderProgram, BlockRegistry& blockRegistr
 
                 if (chunk.initialized)
                 {
-                
                     chunksToDraw.push_back(&chunk);
                 }
             }

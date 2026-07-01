@@ -17,8 +17,26 @@ ChunkData::ChunkData() {
 
 ChunkData::ChunkData(const ChunkData& cd)
 {
-    std::cout << "hello world!\n";
     this->data = new unsigned char[16 * 16 * 256 * 1];
+
+    for (int y = 0; y < 256; y++) {
+        for (int x = 0; x < 16; x++)
+        {
+            for (int z = 0; z < 16; z++)
+            {
+                unsigned char previous = cd.getBlock(glm::ivec3(x, y, z));
+                this->setBlock(glm::ivec3(x, y, z), (int)previous);
+            }
+        }
+    }
+
+}
+    
+ChunkData::ChunkData(ChunkData&& c)
+{
+    this->data = c.data;
+
+    c.data = nullptr;
 
 }
     
@@ -38,7 +56,7 @@ void ChunkData::setBlock(glm::ivec3 blockPos, unsigned int blockID) {
 }
 
 
-unsigned char ChunkData::getBlock(glm::ivec3 blockPos) {
+unsigned char ChunkData::getBlock(glm::ivec3 blockPos) const {
 
     if (blockPos.x < 0 || blockPos.x > 15) {
         return 0;
